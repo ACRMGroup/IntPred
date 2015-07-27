@@ -3,7 +3,9 @@ use strict;
 use warnings;
 
 use MSA;
+use pdb::runBlast;
 use pdb::blastSwissProt;
+use TCNPerlVars;
 use scorecons;
 use DataSet::FindFOSTAFEPs;
 use Carp;
@@ -16,16 +18,20 @@ sub BLAST {
 
     # Get homologue sequences
     # Opts match Anja's originals
-    my $blast    = pdb::blastSwissProt->new(query => $chain, evalue => $eval,
-                                            opts => {-b => 2000, -v => 2000,
-                                                     -F => 'T'});
-    my @hits     = $blast->getHits(reliable => 1);
+    my %arg = (db => $TCNPerlVars::swissProtDB,
+               evalue => $eval, opts => {-b => 2000, -v => 2000,
+                                         -F => 'T'});
+    
+    my $blaster         = pdb::BlastFactory->new(remote => 0)->getBlaster(%arg);
+    my $blastSwsProt    = pdb::blastSwissProt->new(blaster => $blaster);
+    $blastSwsProt->setQuery($chain);
+    my @hits            = $blastSwsProt->getHits(reliable => 1);
     
     my @hitSeqs = ();
     my $hitCount = 0;
     
     foreach my $hit (@hits) {
-        my $hitSeq = eval {$blast->swissProtSeqFromHit($hit)};
+        my $hitSeq = eval {$blastSwsProt->swissProtSeqFromHit($hit)};
         print "Failed to get sequence for hit $hit, $@" && next
             if ! $hitSeq;
         
