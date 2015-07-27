@@ -67,29 +67,22 @@ sub FOSTA {
     my $chain  = shift;
     my $hitMin = shift;
 
-    print "Getting db handles ...\n";
-    my $fostadbh  = DataSet::FindFOSTAFEPs::getFOSTADBH();
-    my $pdbswsdbh = DataSet::FindFOSTAFEPs::getPDBSWSDBH();
-
+    my $findFFs = DataSet::FindFOSTAFEPs->new();
+    
     print "Getting ac for query chain ...\n";
     # get SwissProt AC for chain
-    my $sprot_ac  = getSwissProtACFromPDBID($pdbswsdbh,
+    my $sprot_ac  = getSwissProtACFromPDBID($findFFs->PDBSWSDBH,
                                             $chain->pdb_code,
                                             $chain->chain_id);
 
     print "Getting query SwissProt sequence...\n";
     # get SwissProt sequence from AC
-    my $sprot_id
-        = DataSet::FindFOSTAFEPs::getSwissProtIDFromAC($pdbswsdbh, $sprot_ac);
-    my $spSeq
-        = DataSet::FindFOSTAFEPs::getSequenceFromID($fostadbh, $pdbswsdbh,
-                                                    $sprot_id);
+    my $sprot_id = $findFFs->getSwissProtIDFromAC($sprot_ac);
+    my $spSeq    = $findFFs->getSequenceFromID($sprot_id);
     
     print "Getting FEP sequences ...\n";
     # get functionally equivalent protein sequences
-    my @FEPseqs
-        = DataSet::FindFOSTAFEPs::getReliableFEPSequences($sprot_ac,$fostadbh,
-                                                          $pdbswsdbh);
+    my @FEPseqs = $findFFs->getReliableFEPSequences($sprot_ac);
     print scalar @FEPseqs . " FEP sequences returned\n";
 
     croak "Num. FEP sequences does not reach minimum!" if @FEPseqs < $hitMin;
@@ -101,7 +94,7 @@ sub FOSTA {
     $MSA->consScoreCalculator(scorecons->new(targetSeqIndex => 0));
     my @consScores = $MSA->calculateConsScores();
 
-    return mapResSeq2concScore($chain, $sprot_ac, $pdbswsdbh, \@consScores); 
+    return mapResSeq2concScore($chain, $sprot_ac, $findFFs->PDBSWSDBH, \@consScores); 
 }
 
 sub mapResSeq2concScore {

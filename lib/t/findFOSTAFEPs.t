@@ -22,43 +22,60 @@ BEGIN { use_ok( 'DataSet::FindFOSTAFEPs' ); }
 # Insert your test code below, the Test::More module is used here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-my $testPdbSwsDbh = DataSet::FindFOSTAFEPs::getPDBSWSDBH();
-is(ref $testPdbSwsDbh, "DBI::db", "getPDBSWSDH returns databse handle");
+subtest "test database handles" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    is(ref $testObj->PDBSWSDBH, "DBI::db", "PDBSWSDH is a database handle");
+    
+    is(ref $testObj->FOSTADBH,  "DBI::db", "FOSTADBH is a database handle");
+};
 
-my $testFostaDbh = DataSet::FindFOSTAFEPs::getFOSTADBH();
-is(ref $testFostaDbh, "DBI::db", "getFOSTADBH returns database handle");
+subtest "test getSwissProtIDFromAC" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $testAC = "P12345";
+    my $expID  = "AATM_RABIT";
+    is($testObj->getSwissProtIDFromAC($testAC), $expID,
+       "getSwissProtIDFromAC returns correct id");
+};
 
-my $testAC = "P12345";
-my $expID  = "AATM_RABIT";
-is(DataSet::FindFOSTAFEPs::getSwissProtIDFromAC($testPdbSwsDbh, $testAC), $expID,
-   "getSwissProtIDFromAC returns correct id");
+subtest "test getFOSTAFamIDAndReliability" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $testReliableID = "CNTD1_HUMAN";
+    cmp_deeply([$testObj->getFOSTAFamIDAndReliability($testReliableID)], [1, 13],
+               "getFOSTAFamIDAndReliability returns reliable family id");
+    
+    my $testUnRelID = "CF211_XENTR";
+    cmp_deeply([$testObj->getFOSTAFamIDAndReliability($testUnRelID)], [0, 18591],
+               "getFOSTAFamIDAndReliability returns unreliable family id");
+};
 
-my $testReliableID = "CNTD1_HUMAN";
-cmp_deeply([DataSet::FindFOSTAFEPs::getFOSTAFamIDAndReliability($testFostaDbh,
-                                                       $testReliableID)],
-           [1, 13], "getFOSTAFamIDAndReliability returns reliable family id");
+subtest "test getFEPIDsFromFamID" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $famID = "CNTD1_HUMAN";
+    cmp_deeply([$testObj->getFEPIDsFromFamID($famID, 13)], ["CNTD1_MOUSE"],
+               "getFEPIDsFromFamID returns correct FEPIDs");
+};
 
-my $testUnRelID = "CF211_XENTR";
-cmp_deeply([DataSet::FindFOSTAFEPs::getFOSTAFamIDAndReliability($testFostaDbh,
-                                                       $testUnRelID)],
-           [0, 18591], "getFOSTAFamIDAndReliability returns unreliable family id");
+subtest "test getSequenceFromID" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $famID = "CNTD1_HUMAN";
+    my $gotSeq  = $testObj->getSequenceFromID($famID);
+    is($gotSeq->string(), expSeqStr(), "getSequenceFromID retuns sequence ok");
+};
 
-cmp_deeply([DataSet::FindFOSTAFEPs::getFEPIDsFromFamID($testFostaDbh,
-                                              $testReliableID, 13)],
-           ["CNTD1_MOUSE"], "getFEPIDsFromFamID returns correct FEPIDs");
+subtest "test getACFromID" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $famID = "CNTD1_HUMAN";
+    my $expAC = "Q8N815";
+    is($testObj->getACFromID($famID), $expAC,
+       "getACFromID returns correct AC");
+};
 
-my $gotSeq = DataSet::FindFOSTAFEPs::getSequenceFromID($testFostaDbh,
-                                                       $testPdbSwsDbh,
-                                                       $testReliableID);
-is($gotSeq->string(), expSeqStr(), "getSequenceFromID retuns sequence ok");
-
-my $expAC = "Q8N815";
-is(DataSet::FindFOSTAFEPs::getACFromID($testPdbSwsDbh, $testReliableID), $expAC,
-   "getACFromID returns correct AC");
-
-cmp_deeply([DataSet::FindFOSTAFEPs::getSequences($testPdbSwsDbh, $testFostaDbh,
-                                        $testReliableID)],
-           array_each(isa("sequence")), "getSequences returns sequence objects");
+subtest "test getSequences" => sub {
+    my $testObj = DataSet::FindFOSTAFEPs->new();
+    my $famID = "CNTD1_HUMAN";    
+    cmp_deeply([$testObj->getSequences($famID)],
+               array_each(isa("sequence")), "getSequences returns sequence objects");
+};
 
 sub expSeqStr {
     my $seq = <<EOF;
