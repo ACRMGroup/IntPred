@@ -15,6 +15,8 @@ use strict;
 use warnings;
 use lib ('..');
 use Test::More qw( no_plan );
+use Test::Exception;
+
 BEGIN { use_ok( 'DataSet::CalcConservationScores' ); }
 
 #########################
@@ -26,10 +28,11 @@ my $eval   = 1;
 my $hitMin = 5;
 my $hitMax = 100;
 
-DataSet::CalcConservationScores::BLAST(getTestChain(), $eval, $hitMin,
-                                       $hitMax);
+lives_ok {DataSet::CalcConservationScores::BLAST(getTestChain(), $eval, $hitMin, $hitMax)}
+    "BLAST";
 
-DataSet::CalcConservationScores::FOSTA(getTestChain(), $hitMin);
+lives_ok {DataSet::CalcConservationScores::FOSTA(getTestChain(), $hitMin)}
+    "FOSTA";
 
 sub getTestChain {
     return chain->new(pdb_code => '1bzq', chain_id => 'A',
