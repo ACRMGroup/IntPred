@@ -1,0 +1,3 @@
+These files were copied from ~anya/intf_prediction/code/properties/
+They are required input for calc_patch_propensity, as they contain stats
+that patch propensity calculations are based on

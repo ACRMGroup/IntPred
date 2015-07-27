@@ -1,0 +1,22 @@
+input is /acrm/home/anya/interface_prediction/patches/nonred2.patch.residues.
+[type:sum:count:mean]ala:  2211785.97: 50394:   43.8899
+[type:sum:count:mean]cys:   227022.62:  6542:   34.7023
+[type:sum:count:mean]asp:  3553615.70: 50870:   69.8568
+[type:sum:count:mean]glu:  5590092.76: 63776:   87.6520
+[type:sum:count:mean]phe:  1431371.11: 23736:   60.3038
+[type:sum:count:mean]gly:  1899210.15: 51130:   37.1447
+[type:sum:count:mean]his:  1438858.24: 19457:   73.9507
+[type:sum:count:mean]ile:  1596911.91: 30785:   51.8731
+[type:sum:count:mean]lys:  5586793.60: 53525:  104.3773
+[type:sum:count:mean]leu:  2988649.07: 53948:   55.3987
+[type:sum:count:mean]met:   731381.23: 10662:   68.5970
+[type:sum:count:mean]asn:  2527260.39: 35621:   70.9486
+[type:sum:count:mean]pro:  2446510.22: 37261:   65.6587
+[type:sum:count:mean]gln:  2837098.81: 33615:   84.3998
+[type:sum:count:mean]arg:  5070514.90: 48025:  105.5807
+[type:sum:count:mean]ser:  2307321.83: 45659:   50.5338
+[type:sum:count:mean]thr:  2325985.38: 40820:   56.9815
+[type:sum:count:mean]val:  1827543.72: 38096:   47.9721
+[type:sum:count:mean]trp:   646662.86:  9365:   69.0510
+[type:sum:count:mean]tyr:  1719564.39: 25681:   66.9586
+total ASA for the dataset is 48971792.7180.

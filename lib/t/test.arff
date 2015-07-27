@@ -1,0 +1,17 @@
+@relation dataset-weka.filters.unsupervised.attribute.NominalToBinary-R5-weka.filters.unsupervised.attribute.Standardize
+
+@attribute patchID string
+@attribute propensity numeric
+@attribute hydrophobicity numeric
+@attribute planarity numeric
+@attribute SSbonds numeric
+@attribute Hbonds numeric
+@attribute fosta_scorecons numeric
+@attribute intf_class {I,S}
+
+@data
+
+1a2y:C:100,-0.197333,-0.814082,-0.590363,-0.347633,1.359971,-0.21583,I
+1a2y:C:101,-0.197333,-0.814082,1.69354,-0.347633,1.359971,-0.722922,I
+1adq:A:266,-0.197333,-0.814082,1.69354,-0.347633,-1.030077,?,S
+1adq:A:267,-0.197333,-0.814082,1.69354,-0.347633,-1.091358,?,S

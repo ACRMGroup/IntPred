@@ -1,0 +1,25 @@
+@relation dataset
+
+@attribute patchID string
+@attribute propensity numeric
+@attribute hydrophobicity numeric
+@attribute planarity numeric
+@attribute secondary_str {H,E,EH,C}
+@attribute SSbonds numeric
+@attribute Hbonds numeric
+@attribute fosta_scorecons numeric
+@attribute blast_scorecons numeric
+@attribute intf_class string
+
+@data
+
+1bzq:A:1,-0.1418,-1.8429,1.868031,H,0,0.857143,0.718286,0.432286,?
+1bzq:A:10,-0.0884,-1.3543,4.751408,H,0,0.828571,0.783371,0.537286,?
+1bzq:A:100,-0.1565,-0.7808,3.049778,E,0.076923,0.884615,0.757038,0.582077,?
+1bzq:A:101,-0.1359,-1.03,2.808617,E,0.05,0.9,0.687,0.49925,?
+1bzq:A:102,-0.1415,-0.7333,3.38358,E,0.066667,0.9,0.766633,0.5628,?
+1bzq:A:103,-0.117,-0.6192,2.265457,E,0,0.884615,0.691962,0.474423,?
+1bzq:A:104,-0.1134,-0.5,2.95036,E,0,0.913043,0.71187,0.514652,?
+1bzq:A:105,-0.103,-0.1789,2.941447,E,0,0.894737,0.728684,0.519895,?
+1bzq:A:111,-0.0604,-0.95,3.579121,EH,0.071429,0.75,0.798857,0.590571,?
+1bzq:A:112,-0.1337,-0.5208,3.388097,EH,0.083333,0.791667,0.776292,0.557958,?

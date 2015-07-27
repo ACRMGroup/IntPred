@@ -1,0 +1,58 @@
+* DONE Make XMAS Parsing more robust
+  CLOSED: [2015-07-27 Mon 11:58]
+At the moment parseXMAS.pm parses lines by assuming the order of attributes,
+which may change. Implement XMAS header parsing to determine the order of XMAS
+attributes properly.
+
+This is no longer a problem, as XMAS dependencies have been removed from
+tcnutils/pdb
+
+* DONE Add Anja's option for scorecons
+  CLOSED: [2015-05-19 Tue 17:11]
+This is in her Perl_paths.pm file $valdar01_params = "--matrixnorm karlinlike";
+This is how scorecons is run:
+    my $cmd = "$Perl_paths::scoreconsExe $msa_fname $Perl_paths::valdar01_params";
+
+* DONE Run blast with Anja's options and an evalue filter
+  CLOSED: [2015-05-21 Thu 20:46]
+
+* TODO Implement assignment of pdb chain to swissprot entry automatically
+This would allow the determination of FOSTA FEPs for non-deposited (i.e. user
+specified) chains.
+
+* DONE instance->string ordering
+  CLOSED: [2015-05-21 Thu 20:46]
+user should be able to: pass array of features in desired order,
+use the order of features within a feature string, or use a default.
+
+Or, implement processor::master->printInstances(). TOMORROW, test printInstances
+
+* DONE Setting missing values
+  CLOSED: [2015-05-23 Sat 18:13]
+In theory, only blast and fosta should possibly be missing.
+Eval can be used and exceptions can be thrown. Types can be used to allow
+'?' for Num features.
+** DONE Test for missing FOSTA
+   CLOSED: [2015-05-21 Thu 22:21]
+** DONE Test for missing BLAST
+   CLOSED: [2015-05-23 Sat 18:13]
+
+* DONE test autoLabel when interfaceResidues are not specified in test
+  CLOSED: [2015-05-26 Tue 11:29]
+This is to ensure that interfaceResidues builder wor ok
+
+* DONE Separate new scripts into new directory
+  CLOSED: [2015-05-27 Wed 13:53]
+
+* TODO Improve BLAST/FOSTA Error Handling
+Script needs to die if it's anything other than a < minimum hits problem.
+
+* TODO Improve wekaOutputParser
+At the moment this assumes the form of the output CSV. This could lead to 
+problems in the future
+* TODO Deal with arff self-standardization
+* TODO Standardize test sets without having to reload training set
+This could be possible if I write a short java program that took a training
+set, created a Standardization Filter and initalized it with the training set,
+then serialize that filter object.
+See https://weka.wikispaces.com/Use+Weka+in+your+Java+code
