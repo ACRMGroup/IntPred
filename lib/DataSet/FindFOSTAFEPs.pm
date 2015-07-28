@@ -139,7 +139,6 @@ sub getSequences {
     
     my @seq_ids = @_;
     my @seqs    = ();
-    
     foreach my $seq_id (@seq_ids){
         my $seq = eval {$self->getSequenceFromID($seq_id)};
         next if ! $seq;
@@ -148,30 +147,12 @@ sub getSequences {
     return @seqs;
 }
 
-sub getACFromID {
-    my $self   = shift;
-    my $seq_id = shift;
-    
-    my $acc_sql = "SELECT a.ac 
-                   FROM idac i, acac a
-                   WHERE i.id='$seq_id'
-                   AND i.ac = a.altac";
-    my $acc = $self->PDBSWSDBH->selectrow_array( $acc_sql );
-    return $acc;
-}
-
 sub getSequenceFromID {
     my $self   = shift;
     my $seq_id = shift;
-    
     my $seqStr = $self->getSequenceStrFromID($seq_id);
     croak "No sequence string found for id $seq_id" if ! $seqStr;
-    
-    my $accessionCode  = $self->getACFromID($seq_id);
-    croak "No accession code found for id $seq_id" if ! $accessionCode;
-    
-    return sequence->new(string => $seqStr,
-                         id => "$accessionCode|$seq_id")
+    return sequence->new(string => $seqStr, id => $seq_id);
 }
 
 sub getSequenceStrFromID {

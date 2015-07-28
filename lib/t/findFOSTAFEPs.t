@@ -62,14 +62,6 @@ subtest "test getSequenceFromID" => sub {
     is($gotSeq->string(), expSeqStr(), "getSequenceFromID retuns sequence ok");
 };
 
-subtest "test getACFromID" => sub {
-    my $testObj = DataSet::FindFOSTAFEPs->new();
-    my $famID = "CNTD1_HUMAN";
-    my $expAC = "Q8N815";
-    is($testObj->getACFromID($famID), $expAC,
-       "getACFromID returns correct AC");
-};
-
 subtest "test getSequences" => sub {
     my $testObj = DataSet::FindFOSTAFEPs->new();
     my $famID = "CNTD1_HUMAN";    
