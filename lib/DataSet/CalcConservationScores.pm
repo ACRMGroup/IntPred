@@ -21,7 +21,7 @@ sub BLAST {
                                          -F => 'T'});
     
     my $blaster = pdb::BLAST::Factory->new(remote => 0,
-                                         dbType => 'swsprot')->getBlaster(%arg);
+                                           dbType => 'swsprot')->getBlaster(%arg);
     $blaster->setQuery($chain);
     $blaster->runBlast();
     
@@ -48,9 +48,10 @@ sub BLAST {
     
     # Align homologue sequences and chain sequence
     # Flags and opts match Anja's originals
-    my $MSA   = MSA::Muscle->new(seqs  => [$chain, @hitSeqs],
-                                 flags => [qw(-stable -quiet)],
-                                 opts  => {-maxiters => 100});
+    my @muscleArg = (seqs  => [$chain, @hitSeqs],
+                     flags => [qw(-stable -quiet)],
+                     opts  => {-maxiters => 100} );
+    my $MSA   = MSA::Muscle::Factory->new(remote => 0)->getMuscle(@muscleArg);
     my $sCons = scorecons->new(targetSeqIndex => 0,
                                opts => {'--matrixnorm' => 'karlinlike'});
     $MSA->consScoreCalculator($sCons);
@@ -88,7 +89,8 @@ sub FOSTA {
     croak "Num. FEP sequences does not reach minimum!" if @FEPseqs < $hitMin;
     
     print "Doing FEP sequence alignment ...\n";
-    my $MSA = MSA::Muscle->new(seqs => [$spSeq, @FEPseqs]);
+    my @muscleArg = (seqs => [$spSeq, @FEPseqs]);
+    my $MSA = MSA::Muscle::Factory->new(remote => 0)->getMuscle(@muscleArg);
 
     print "Calculating conservation scores for query residues\n";
     $MSA->consScoreCalculator(scorecons->new(targetSeqIndex => 0));
