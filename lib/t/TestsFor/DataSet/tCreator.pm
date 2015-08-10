@@ -172,11 +172,13 @@ sub test_ConsScoreFeatures {
     # First check that builders that run calcConservationScores run ok
     $chProc->model->FOSTAHitMin(4);
     $chProc->resID2FOSTAScore();
-    ok(! $chProc->FOSTAErr(), "resID2FOSTAScore build ok");
+    ok(! $chProc->FOSTAErr(), "resID2FOSTAScore build ok")
+        or diag explain $chProc->FOSTAErr();
 
     $chProc->model->BLASTHitMax(10); # Make hitMax small to speed up testing
     $chProc->resID2BLASTScore();
-    ok(! $chProc->BLASTErr(), "resID2BLASTScore build ok");
+    ok(! $chProc->BLASTErr(), "resID2BLASTScore build ok")
+        or diag explain $chProc->BLASTErr();
     
     # Then check that conservation scores are properly assigned to instance
     $chProc->model->setExpectedFeatures("blast", "fosta");
