@@ -4,10 +4,14 @@ use warnings;
 
 use MSA;
 use pdb::BLAST;
+use pdb::pdbsws;
 use TCNPerlVars;
 use scorecons;
-use DataSet::FindFOSTAFEPs;
 use Carp;
+use UNIPROT;
+use FOSTA;
+
+use sequence;
 
 sub BLAST {
     my $chain  = shift;
@@ -68,22 +72,24 @@ sub FOSTA {
     my $chain  = shift;
     my $hitMin = shift;
 
-    my $findFFs = DataSet::FindFOSTAFEPs->new();
+    my $findFFs = FOSTA::Factory->new(remote => 0)->getFOSTA();
+    my $pdbsws  = pdb::pdbsws::Factory->new(remote => 0)->getpdbsws;
     
     print "Getting ac for query chain ...\n";
     # get SwissProt AC for chain
-    my $sprot_ac  = getSwissProtACFromPDBID($findFFs->PDBSWSDBH,
-                                            $chain->pdb_code,
-                                            $chain->chain_id);
-
+    my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($chain->pdb_code,
+                                                         $chain->chain_id);
+    croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
+    my $sprot_ac = $sprot_ac[0];
+    my $FASTAStr = UNIPROT::GetFASTA($sprot_ac, -remote => 1);
+    my $sprot_id = UNIPROT::parseIDFromFASTAStr($FASTAStr);
+    
     print "Getting query SwissProt sequence...\n";
-    # get SwissProt sequence from AC
-    my $sprot_id = $findFFs->getSwissProtIDFromAC($sprot_ac);
-    my $spSeq    = $findFFs->getSequenceFromID($sprot_id);
+    my $spSeq    = sequence->new($FASTAStr);
     
     print "Getting FEP sequences ...\n";
     # get functionally equivalent protein sequences
-    my @FEPseqs = $findFFs->getReliableFEPSequences($sprot_ac);
+    my @FEPseqs = $findFFs->getReliableFEPSequencesFromSwissProtID($sprot_id);
     print scalar @FEPseqs . " FEP sequences returned\n";
 
     croak "Num. FEP sequences does not reach minimum!" if @FEPseqs < $hitMin;
@@ -96,22 +102,25 @@ sub FOSTA {
     $MSA->consScoreCalculator(scorecons->new(targetSeqIndex => 0));
     my @consScores = $MSA->calculateConsScores();
 
-    return mapResSeq2concScore($chain, $sprot_ac, $findFFs->PDBSWSDBH, \@consScores); 
+    return mapResSeq2conScore($chain, $sprot_ac, \@consScores, $pdbsws); 
 }
 
-sub mapResSeq2concScore {
+sub mapResSeq2conScore {
     my $chain          = shift;
     my $sprot_ac       = shift;
-    my $pdbswsdbh      = shift;
     my $consScoresAref = shift;
+    my $pdbsws         = shift;
     
     print "Mapping chain resSeqs to SwissProt numbering ...\n";
     # Get ChainResSeq -> SwissProtNum map
-    my %resSeq2SprotNum = mapResSeq2SprotResNum($chain, $sprot_ac, $pdbswsdbh);
+    my %resSeq2SprotNum
+        = $pdbsws->mapResSeq2SwissProtNum($chain->pdb_code,
+                                         $chain->chain_id,
+                                         $sprot_ac);
     
     print "Mapping SwissProt numbering to conservation scores ...\n";
     # Get SwissProtNum -> conservation scores map
-    my %sprotNum2consScore = mapSprotNum2consScores(@{$consScoresAref});
+    my %sprotNum2consScore = mapSprotNum2conScore(@{$consScoresAref});
 
     # Combine maps to map ChainResSeq -> scorecons
     my %resSeq2consScore
@@ -121,7 +130,7 @@ sub mapResSeq2concScore {
     return %resSeq2consScore;
 }
 
-sub mapSprotNum2consScores {
+sub mapSprotNum2conScore {
     my @consScores = @_;
     
     # Simple map from consScore index -> consScore
@@ -155,26 +164,6 @@ sub mapResSeq2SprotResNum {
         }
     }
     return %resSeq2SprotResNum;
-}
-
-# Uses pdbsws to find SwissProt AC that is assigned to passed pdb chain
-sub getSwissProtACFromPDBID {
-    my $pdbswsdbh = shift;
-    my $pdb_id    = shift;
-    my $chain     = shift;
-    
-    my $sql = "SELECT ac
-               FROM pdbsws
-               WHERE pdb = '$pdb_id'
-               AND chain = '$chain'
-               AND valid = 't'
-               AND aligned = 't'
-               AND ac != 'SHORT'
-               AND ac != 'DNA'
-               AND ac != 'ERROR';";
-    
-    my $sprot_ac = $pdbswsdbh->selectrow_array($sql);
-    return $sprot_ac;
 }
 
 1;
