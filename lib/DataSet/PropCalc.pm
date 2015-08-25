@@ -3,9 +3,9 @@ package DataSet::PropCalc;
 use strict;
 use warnings;
 use Moose;
-use types;
+use TCNUtil::types;
 
-foreach my $type qw(intf surf) {
+foreach my $type (qw(intf surf)) {
     has $type . 'StatFile' => (
         is => 'rw',
         isa => 'FileReadable',

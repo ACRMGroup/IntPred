@@ -2,7 +2,7 @@ package Types;
 use Moose::Util::TypeConstraints;
 use Config::IniFiles;
 
-use types;
+use TCNUtil::types;
 
 subtype 'IntPred::ArrayRefOfStrings',
     as 'ArrayRef[Str]';

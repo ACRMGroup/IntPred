@@ -34,7 +34,7 @@ sub test_constructor {
 
 package TestsFor::DataSet::Instance::Model;
 use Test::Class::Moose;
-use ARFF;
+use TCNUtil::ARFF;
 use Carp;
 
 extends 'TestsFor::DataSet::Instance';

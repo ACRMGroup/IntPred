@@ -71,35 +71,36 @@ sub expHeader {
 sub compareInstances {
     my ($instAref1, $instAref2) = @_;
 
-    print "WARNING: ignoring Hb feature, as this deliberately differs\n";
-    
+    print "WARNING: Only checking Hb feature is present (no value check), "
+        . "as this deliberately differs\n";
+    print "WARNING: Only checking blast and fosta features are present (no "
+        . "value check), as values will change over time as databases change.\n";
     for (my $i = 0 ; $i < @{$instAref1} ; ++$i) {
         my $instA = $instAref1->[$i];
         my $instB = $instAref2->[$i];
-
-        # NOTE that we are ignoring Hb
-        next if instanceCmp($instA, $instB, Hb => 1);
-
+        next if instanceCmp($instA, $instB, {Hb => 1, fosta => 1, blast => 1});
         croak "Instances at index $i do not match: $@";
     }
     return 1;
 }
 
 sub instanceCmp {
-    my $iA = shift;
-    my $iB = shift;
-    my %ignore = @_;
+    my $iA          = shift;
+    my $iB          = shift;
+    my $ignoreValue = shift;
 
     foreach my $feat (expFeatures()) {
-
-        next if exists $ignore{$feat};
-        
         my $pred = 'has_' . $feat;
         
         foreach my $inst ($iA, $iB) {
             croak "Instance " . $inst->id() . " does not have $feat feature!"
                 if ! $inst->$pred;
-        }        
+            croak "Instance " . $inst->id() . " $feat feature is missing!"
+                if $inst->$feat eq '?';
+        }
+
+        next if exists $ignoreValue->{$feat};
+        
         if (looks_like_number($iA->$feat)) {
             croak "Feature values for $feat do not match! "
                 . join(" vs. ", $iA->$feat, $iB->$feat)

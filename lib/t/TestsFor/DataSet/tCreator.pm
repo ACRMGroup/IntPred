@@ -1,7 +1,7 @@
 package CreatorTester;
 use Moose::Role;
 use Test::More;
-use pdb::pdb;
+use pdb;
 
 has 'class' => (
     is => 'ro',
@@ -89,16 +89,16 @@ sub supplyClass {
 sub test_features {
     my $test = shift;
     my $pProc = $test->class->new($test->constructorArgs());
-
+print
     $pProc->model->setExpectedFeatures(qw(id pho pln SS Hb));
 
     my $inst = $pProc->nextInstance();
 
-    is($inst->id,  "2wap:A:103",       "Patch ID added to instance");
-    is($inst->pho, -0.166666666666667, "Patch hydropho added to instance");
-    is($inst->pln,  0.92322439,        "Patch planarity added to instance");
-    is($inst->SS,   0,                 "Patch SS bonds added to instance");
-    is($inst->Hb,   0,                 "Patch Hb bonds added to instance");
+    is($inst->id, "2wap:A:103", "Patch ID added to instance");
+    is(sprintf("%.3f", $inst->pho), -0.167, "Patch hydropho added to instance");
+    is(sprintf("%.3f", $inst->pln),  0.923, "Patch planarity added to instance");
+    is($inst->SS, 0, "Patch SS bonds added to instance");
+    is($inst->Hb, 0, "Patch Hb bonds added to instance");
 }
 
 package TestsFor::DataSet::Creator::Chain;
@@ -160,12 +160,7 @@ sub test_missingValues {
     is($inst->blast, '?', "missing blast value ok");
 }
 
-# TODO: this test should check FOSTAErr and BLASTErr after
-# resID2FOSTA/BLASTScore calls.
-# TODO: in a separate test, score hashes should be manipulated so that
-# results of $inst->blast() and $inst->fosta calls do not rely on dynamic
-# BLAST and FOSTA results
-sub test_ConsScoreFeatures {
+sub test_resID2conScoreBuilds {
     my $test = shift;
     my $chProc = $test->class->new($test->constructorArgs());
 
@@ -182,23 +177,31 @@ sub test_ConsScoreFeatures {
     
     # Then check that conservation scores are properly assigned to instance
     $chProc->model->setExpectedFeatures("blast", "fosta");
+    _setConScoreMaps($chProc);
     my $inst = $chProc->nextInstance();
 
-    is($inst->blast(), '0.575',             "blast feature added ok");
-    is($inst->fosta(), '0.618333333333333', "fosta feature added ok");
+    is(sprintf($inst->blast()), 1, "blast feature added ok");
+    is(sprintf($inst->fosta()), 1, "fosta feature added ok");
+}
+
+sub _setConScoreMaps {
+    my $chProc = shift;
+    foreach my $consScore (qw(FOSTAScore BLASTScore)) {
+        my $map = "resID2$consScore";
+        $chProc->$map({'A.101' => 1, 'A.102' => 1, 'A.103' => 1});
+    }
 }
 
 sub test_features {
     my $test = shift;
     my $chProc = $test->class->new($test->constructorArgs());
     $chProc->model->setExpectedFeatures(qw(secStruct pro));
-
-
     my $inst = $chProc->nextInstance();
+    
     is($inst->secStruct, "H", "secStruct added to instance");
 
-    my $exp = 0.0615;
-    ok($inst->pro() - $exp < 0.0001, "propensity feature added ok");
+    my $expPro = 0.0615;
+    ok($inst->pro() - $expPro < 0.0001, "propensity feature added ok");
 }
 
 package TestsFor::DataSet::Creator::Complex;
@@ -245,10 +248,9 @@ sub test_features {
     my $test   = shift;
     my $cProc = $test->class->new($test->constructorArgs());
     $cProc->interfaceResidues(["A.101", "A.102", "A.103"]);
-
     $cProc->model->setExpectedFeatures("class");
-    
     my $inst = $cProc->nextInstance();
+    
     is($inst->class, "I", "class label added to instance");
 }
 
@@ -257,7 +259,7 @@ use Test::Class::Moose;
 with 'CreatorTester';
 
 use DataSet::Creator;
-use pdb::pdb;
+use pdb;
 
 sub supplyClass {
     return 'DataSet::Creator::PDB';

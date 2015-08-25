@@ -95,7 +95,7 @@ use Moose;
 extends 'DataSet::Instance';
 
 use Carp;
-use ARFF;
+use TCNUtil::ARFF;
 
 ### Class Attributes ###########################################################
 ################################################################################

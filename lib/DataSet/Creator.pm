@@ -164,7 +164,7 @@ sub stringify {
 package DataSet::Creator::PDB;
 use Moose;
 use MooseX::Aliases;
-use types;
+use TCNUtil::types;
 
 extends 'DataSet::Creator';
 use overload '""' => 'stringify';

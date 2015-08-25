@@ -2,16 +2,16 @@ package DataSet::CalcConservationScores;
 use strict; 
 use warnings;
 
-use MSA;
+use TCNUtil::MSA;
 use pdb::BLAST;
 use pdb::pdbsws;
 use TCNPerlVars;
-use scorecons;
+use TCNUtil::scorecons;
 use Carp;
 use UNIPROT;
-use FOSTA;
+use TCNUtil::FOSTA;
 
-use sequence;
+use TCNUtil::sequence;
 
 sub BLAST {
     my $chain  = shift;
@@ -53,11 +53,10 @@ sub BLAST {
     # Align homologue sequences and chain sequence
     # Flags and opts match Anja's originals
     my @muscleArg = (seqs  => [$chain, @hitSeqs],
-                     flags => [qw(-stable -quiet)],
+                     flags => [qw(-quiet)],
                      opts  => {-maxiters => 100} );
     my $MSA   = MSA::Muscle::Factory->new(remote => 0)->getMuscle(@muscleArg);
-    my $sCons = scorecons->new(targetSeqIndex => 0,
-                               opts => {'--matrixnorm' => 'karlinlike'});
+    my $sCons = scorecons->new(targetSeqIndex => 0);
     $MSA->consScoreCalculator($sCons);
    
     my @scorecons = $MSA->calculateConsScores();
@@ -72,8 +71,8 @@ sub FOSTA {
     my $chain  = shift;
     my $hitMin = shift;
 
-    my $findFFs = FOSTA::Factory->new(remote => 0)->getFOSTA();
-    my $pdbsws  = pdb::pdbsws::Factory->new(remote => 0)->getpdbsws;
+    my $findFFs = FOSTA::Factory->new(remote => 1)->getFOSTA();
+    my $pdbsws  = pdb::pdbsws::Factory->new(remote => 1)->getpdbsws;
     
     print "Getting ac for query chain ...\n";
     # get SwissProt AC for chain

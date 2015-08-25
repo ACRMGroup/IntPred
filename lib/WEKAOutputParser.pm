@@ -2,8 +2,6 @@ package WEKAOutputParser;
 use Moose;
 use Carp;
 use Moose::Util::TypeConstraints;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Types;
 
 has 'input' => (

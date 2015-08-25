@@ -1,7 +1,7 @@
 package TestsFor::Predictor;
 use Test::Class::Moose;
 use Predictor;
-use ARFF::FileParser;
+use TCNUtil::ARFF::FileParser;
 
 use DataSet;
 

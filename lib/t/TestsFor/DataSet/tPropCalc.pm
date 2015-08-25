@@ -1,7 +1,7 @@
 package TestsFor::DataSet::PropCalc;
 use Test::Class::Moose;
 use DataSet::PropCalc;
-use types;
+use TCNUtil::types;
 
 has 'class'        => (is => 'ro', isa => 'Str',
                        default => sub {'DataSet::PropCalc'});

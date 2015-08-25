@@ -1,9 +1,9 @@
 package DataSet;
 use Moose;
-use types;
+use TCNUtil::types;
 use WEKAOutputParser;
 use Carp;
-use ARFF;
+use TCNUtil::ARFF;
 
 has 'instancesAref' => (
     isa      => 'ArrayRef[DataSet::Instance]',

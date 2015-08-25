@@ -1,6 +1,6 @@
 package DataSet::Input;
 use Moose;
-use types;
+use TCNUtil::types;
 use Moose::Util::TypeConstraints;
 use pdb::get_files;
 use Carp;

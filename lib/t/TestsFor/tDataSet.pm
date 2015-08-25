@@ -2,7 +2,7 @@ package TestsFor::DataSet;
 use Test::Class::Moose;
 use DataSet;
 use DataSet::Instance;
-use ARFF;
+use TCNUtil::ARFF;
 
 has 'class' => (default => 'DataSet', isa => 'Str', is => 'ro', lazy => 1);
 
