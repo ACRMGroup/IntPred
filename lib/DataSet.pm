@@ -31,6 +31,74 @@ has 'expectedTypeForAttribute' => (
     builder => '_buildExpectedTypeForAttribute',
 );
 
+sub makeArffCompatible {
+    my $self = shift;
+    my $arff = $self->arff();
+    
+    while (my ($attrName, $attrType) = each %{$self->expectedTypeForAttribute}) {
+        $arff->attributeDescriptionWithName($attrName)->type($attrType);
+    }
+    
+    # Convert secondary structure into four binary attributes
+    my $secStructAttrName = "secondary_str";
+    $arff->transAttributeWithNameToBinaryFromNominal($secStructAttrName);
+}
+
+sub standardizeArffUsingRefArff {
+    my $self    = shift;
+    my $refArff = shift;
+
+    $self->arff->standardize($refArff);
+}
+
+sub getInstances {
+    my $self = shift;
+    return @{$self->instancesAref};
+}
+
+sub getInstanceLabels {
+    my $self = shift;
+    return map {$_->getLabel()} $self->getInstances();
+}
+
+sub writePatchFilesToDir {
+    my $self = shift;
+    my $dir  = shift;
+    
+    my %instancesForPDB = ();
+    push(@{$instancesForPDB{[split(":", $_->id)]->[0]}}, $_)
+        foreach $self->getInstances();
+
+    while (my ($pdbCode, $instanceAref) = each %instancesForPDB) {
+        my $outFile = "$dir/" . $pdbCode . ".patches";
+        open(my $OUT, ">", $outFile) or die "Cannot open file $outFile, $!";
+        print {$OUT} map {$_->summary} @{$instanceAref};
+        close  $OUT;
+    }
+}
+
+sub mapWEKAOutput {
+    my $self       = shift;
+    my $wekaOutput = shift;
+
+    $self->instanceModel->setExpectedFeatures("predScore");
+    my @scores
+        = WEKAOutputParser->new(input => $wekaOutput)->getTransformedScores();
+    $self->_mapScoresToInstances(@scores);
+}
+
+sub _mapScoresToInstances {
+    my $self   = shift;
+    my @scores = @_;
+
+    croak "There are not the same amount of scores as there are instances!"
+        if @scores != @{$self->instancesAref};
+    
+    for (my $i = 0 ; $i < @scores ; ++$i) {
+        $self->instancesAref->[$i]->predScore($scores[$i]);
+    }
+}
+
 around 'BUILDARGS' => sub {
     my $orig  = shift;
     my $class = shift;
@@ -102,69 +170,6 @@ sub _dataSetInstance2ARFFInstance {
     my $arffInst = ARFF::Instance->new();
     $arffInst->addAttributes(@attributes);
     return $arffInst;
-}
-
-sub makeArffCompatible {
-    my $self = shift;
-    my $arff = $self->arff();
-    
-    while (my ($attrName, $attrType) = each %{$self->expectedTypeForAttribute}) {
-        $arff->attributeDescriptionWithName($attrName)->type($attrType);
-    }
-    
-    # Convert secondary structure into four binary attributes
-    my $secStructAttrName = "secondary_str";
-    $arff->transAttributeWithNameToBinaryFromNominal($secStructAttrName);
-}
-
-sub standardizeArffUsingRefArff {
-    my $self    = shift;
-    my $refArff = shift;
-
-    $self->arff->standardize($refArff);
-}
-
-sub getInstances {
-    my $self = shift;
-    return @{$self->instancesAref};
-}
-
-sub writePatchFilesToDir {
-    my $self = shift;
-    my $dir  = shift;
-    
-    my %instancesForPDB = ();
-    push(@{$instancesForPDB{[split(":", $_->id)]->[0]}}, $_)
-        foreach $self->getInstances();
-
-    while (my ($pdbCode, $instanceAref) = each %instancesForPDB) {
-        my $outFile = "$dir/" . $pdbCode . ".patches";
-        open(my $OUT, ">", $outFile) or die "Cannot open file $outFile, $!";
-        print {$OUT} map {$_->summary} @{$instanceAref};
-        close  $OUT;
-    }
-}
-
-sub mapWEKAOutput {
-    my $self       = shift;
-    my $wekaOutput = shift;
-
-    $self->instanceModel->setExpectedFeatures("predScore");
-    my @scores
-        = WEKAOutputParser->new(input => $wekaOutput)->getTransformedScores();
-    $self->_mapScoresToInstances(@scores);
-}
-
-sub _mapScoresToInstances {
-    my $self   = shift;
-    my @scores = @_;
-
-    croak "There are not the same amount of scores as there are instances!"
-        if @scores != @{$self->instancesAref};
-    
-    for (my $i = 0 ; $i < @scores ; ++$i) {
-        $self->instancesAref->[$i]->predScore($scores[$i]);
-    }
 }
 
 1;

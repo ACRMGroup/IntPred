@@ -9,7 +9,7 @@ has 'class' => (default => 'DataSet', isa => 'Str', is => 'ro', lazy => 1);
 sub constructorArgs {
     my $test = shift;
 
-    return (instancesAref => [DataSet::Instance->new()],
+    return (instancesAref => [DataSet::Instance->new(id => 'Test:Instance', class => 'T')],
             instanceModel =>  DataSet::Instance::Model->new());
 }
     
@@ -34,6 +34,14 @@ sub test_arffCompatibilization {
     
     cmp_deeply(\@gotAttrNameAndType, \@expAttrNameAndType,
        "dataSet->arff has expected attributes after makeArffCompatible");
+}
+
+
+sub test_getInstanceLabels {
+    my $test  = shift;
+    my $tDSet = $test->class->new($test->constructorArgs());
+    cmp_deeply([$tDSet->getInstanceLabels()], ["Test:Instance:T"],
+               "expected instance labels returned");
 }
 
 sub _expAttrNameAndType {

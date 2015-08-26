@@ -87,6 +87,11 @@ sub stringify {
     return "DataSet::Instance";
 }
 
+sub getLabel {
+    my $self = shift;
+    return join(":", ($self->id, $self->class));
+}
+
 ################################# END OF CLASS #################################
 ################################################################################
 

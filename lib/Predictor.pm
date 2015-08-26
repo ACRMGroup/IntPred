@@ -1,7 +1,7 @@
 package Predictor;
 use Moose;
 use DataSet;
-use WEKA;
+use TCNUtil::WEKA;
 use Carp;
 
 has 'trainingSet' => (
