@@ -67,10 +67,12 @@ has 'patchID2Label' => (
 # Expected line format id:targetChainIDs:complexedChainIDs
 # where chainIDs are comma-separated. Multiple chain pairs can be listed.
 # Whitespace is ignored
-# e.g. 2wap : A:B : C,D:E,F
-#      1wps : B:  
-# in the second example no complexed chain ids are been given, only targets.
-#
+# e.g. 2wap : A:B   : C,D:E,F
+#      1wps : B:
+#      1jcl : A:-A  : 
+# In the second example no complexed chain ids are been given, only targets.
+# In the third example, '-' is used to indicate a negation. This will result
+# in all chains except A being assigned to complex.
 # The first id field will be read according to the idRead setting.
 # If idRead = 'file' then id will be treated as a file path. Otherwise, it
 # will be treated as a pdb code that can be used to find a pdb file locally.
@@ -87,9 +89,9 @@ around 'BUILDARGS' => sub {
 
         my %arg = ();
         
-        # Remove whitespace
-        $line =~ s/\s//g;
-
+        $line =~ s/\s//g;          # Remove whitespace
+        $line =~ s/-(?=[^,])/-,/g; # Add comma after negation to make parsing easier
+        
         # Split line into an id and a hash of chain pairs
         # Hash makes dealing with the pairs easier later
         my ($id, @chainPairs) = split(":", $line);
