@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
 # transformPatch2ResiduePred.pl --- This script will transform per-patch
 # predictions into per residue predictions
 # Author: Tom Northey <zcbtfo4@acrm18>
