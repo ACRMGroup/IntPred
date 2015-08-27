@@ -149,11 +149,21 @@ sub _buildArff {
     my @arffInstances
         = map {$self->_dataSetInstance2ARFFInstance($_, @attributeDescriptions)}
             @{$self->instancesAref()};
-    
+
+    _mapUnlabelledValues(@arffInstances);
+
     return ARFF->new(attributeDescriptions => \@attributeDescriptions,
                      instances             => \@arffInstances);
 }
 
+sub _mapUnlabelledValues {
+    my $self          = shift;
+    my @arffInstances = @_;
+    map { $_->setValueForAttributeWithName('?', 'intf_class')
+              if $_->getValueForAttributeWithName('intf_class') eq 'U' }
+        @arffInstances;    
+}
+    
 sub _dataSetInstance2ARFFInstance {
     my $self = shift;
     my $dSetInstance = shift;
