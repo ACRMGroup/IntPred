@@ -159,7 +159,10 @@ sub resID2PredAndValue {
         
         my ($pdbCode, $chainID) = split(":", $patchID);
         
-        my @resSeqs = @{$patchID2ResSeqMap->{$patchID}};
+        my @resSeqs = eval { @{$patchID2ResSeqMap->{$patchID}} };
+        if (! @resSeqs) {
+            croak "No patchID => resSeq mapping exists for patch $patchID!";
+        }
         
         foreach my $resSeq (@resSeqs) {
             my $resID = join(":", lc($pdbCode), $chainID, $resSeq);
