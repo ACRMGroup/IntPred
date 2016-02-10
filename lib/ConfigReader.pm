@@ -12,14 +12,25 @@ use Types;
 use Config::IniFiles;
 use File::Basename;
 use File::Spec;
-
+use Carp;
+    
 has 'config' => (
     is       => 'rw',
     isa      => 'Config::IniFiles',
     required => 1,
     coerce   => 1,
-    handles  => [qw(val exists newval)],
+    handles  => [qw(val exists newval setval)],
 );
+
+around 'val' => sub {
+    my $orig  = shift;
+    my $class = shift;
+
+    croak "Value for section $_[0], parameter $_[1] is not defined!"
+        if ! $class->exists(@_);
+
+    return $class->$orig(@_);
+};
 
 around 'BUILDARGS' => sub {
     my $orig  = shift;
