@@ -632,7 +632,7 @@ sub addFeatures {
         my $p = $self->patch();
 
         # resIDs, resNames and summary are all needed by parent Creators
-        $inst->resIDs([$p->getResIDs]);
+        $inst->resIDs([$p->getResIDs(include_missing => 0)]);
         $inst->resNames([$p->getResNames($p->getResIDs)]);
         $inst->summary($p->summary);
         
