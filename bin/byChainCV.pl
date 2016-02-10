@@ -2,18 +2,27 @@
 
 use strict;
 use warnings;
+use Carp;
 use TCNPerlVars;
-use WEKA;
-use confusion_table;
+use TCNUtil::WEKA;
+use TCNUtil::confusion_table;
 use Getopt::Long;
 
 use File::Basename;
 use List::Compare;
 
 # Get cmd-line options
-my $balance  = 0;
-my $numFolds = 0; 
+my $balance     = 0;
+my $numFolds    = 0;
+my $labelDist   = 0.5;
+
+unless ($labelDist < 1) {
+    print "Label distribution must be < 1!\n";
+    exit(1);
+}
+
 GetOptions("b",   \$balance,
+           "d=s", \$labelDist,
            "k=i", \$numFolds);
 
 # Get cmd-line args
@@ -35,18 +44,21 @@ my %pdbID2balancedLines = ();
 if ($balance) {
     # Create balanced sets of lines for each pdbID
     %pdbID2balancedLines
-        = map {$_ => balanceLines($pdbID2dataLines{$_})} keys %pdbID2dataLines;
+        = map {$_ => balanceLines($pdbID2dataLines{$_}, $labelDist)} keys %pdbID2dataLines;
 }
 
 # If training dataset needs to be balanced, send balanced line arrays for
 # partitioning. Otherwise, send unbalanced line arrays.
 my $training = $balance ? \%pdbID2balancedLines : \%pdbID2dataLines;
 
-print "Creating train and test sets\n";
+print "Creating final output model\n";
+outputFinalModel($modelsDir, $arffDir, $arffHeader,
+                 map {@{$_}} values %{$training});
+
+print "Creating byChain train and test sets\n";
 # Map testpdbID => trainingInstanceLines  
 my %testpdbID2trainingInstanceLines
     = mapTestpdbID2trainingInstanceLines($training, \%test2trainpdbIDs);
-
 
 # Map testpdbID => [trainingInstanceLines, testInstanceLines]
 my %pdbID2trainAndTestInstanceLinesArefs
@@ -61,7 +73,7 @@ if ($numFolds) {
 print "Creating train and test .arffs\n";
 # Create train and test .arff files
 my @trainAndTestArefs  = createPartitionArffs($arffHeader, $arffDir,
-                                      %pdbID2trainAndTestInstanceLinesArefs);
+                                              %pdbID2trainAndTestInstanceLinesArefs);
 
 my @wekaOutputs = ();
 
@@ -100,6 +112,25 @@ $mergedTable->print_all();
 
 ### SUBROUTINES ################################################################
 ################################################################################
+
+sub outputFinalModel {
+    my $modelsDir  = shift;
+    my $arffDir    = shift;
+    my $arffHeader = shift;
+    my @trainingInstanceLines = @_;
+    
+    my $arffTrainFile = "$arffDir/complete.train.arff";
+    open(my $OUT, ">", $arffTrainFile)
+        or die "Cannot open file $arffTrainFile, $!";
+    print {$OUT} $arffHeader, "\n", @trainingInstanceLines;
+    close $OUT;
+
+    my $modelFile    = "$modelsDir/complete.train.model";
+    my $randomForest = WEKA::randomForest->new(model => $modelFile,
+                                               trainArff => $arffTrainFile,
+                                               removeAttribute => 1);
+    $randomForest->train();
+}
 
 sub makeFolds {
     my $numFolds = shift;
@@ -229,22 +260,24 @@ sub createPartitionArffs {
 }
 
 sub balanceLines {
-    my $lineAref = shift;
+    my $lineAref  = shift;
+    my $labelDist = shift;
     
     my @intfLines = grep {/,I$/} @{$lineAref};
     my @surfLines = grep {/,S$/} @{$lineAref};
 
-    my @balancedSurfLines = ();
-
-    if (@intfLines > @surfLines) {
-        return [@intfLines, @surfLines];
-    }
+    use Data::Dumper;
+    print Dumper $lineAref;
+    croak "No interface instances found!" if ! @intfLines;
+    croak "No surface instances found!"   if ! @surfLines;
     
+    my @balancedSurfLines = ();
+            
     # Randomly pick surface lines untill you have a number equal to the number
     # of interface lines, i.e. balance the dataset!
     push @balancedSurfLines, splice @surfLines, rand @surfLines, 1
-        while @balancedSurfLines < scalar @intfLines;
-    
+        while @balancedSurfLines / (@intfLines + @balancedSurfLines) < $labelDist && @surfLines;
+
     return [@intfLines, @balancedSurfLines];
 }
 
@@ -385,6 +418,7 @@ If no sshMachine is supplied, then WEKA is run locally.
  -b : Balance training sets.
  -k : k-fold CV. If specified, this will split training and test sets into k
       sets for CV, rather than doing leave-one-out byChain CV.
+}
 
 byChainCV.pl allows you to perform by-chain cross validation on a data set of
 patches. By-chain cross validation ensures that patches from a given chain do
