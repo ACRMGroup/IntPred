@@ -12,17 +12,20 @@ has 'inputFile' => (
     lazy => 1,
 );
 
+has 'pdbGetFile' => (
+    isa => 'pdb::get_files',
+    is  => 'rw',
+    default => sub {pdb::get_files->new()},
+    lazy => 1
+);
+
 sub fileFromPDBCode {
     my $self = shift;
-
-    croak "input: pdbCode must be assigned!"
-        if ! $self->has_pdbCode();
-    
-    my $getFile = pdb::get_files->new(pdb_code => $self->pdbCode);
-    croak "Need to implement finding other pdb file types!"
-        if $self->pdbType ne 'pdb';
-
-    return $getFile->pdb_file;
+    croak "input: pdbCode must be assigned!" if ! $self->has_pdbCode();
+    $self->pdbGetFile->pdb_code($self->pdbCode);
+    return $self->pdbType eq 'pdb' ? $self->pdbGetFile->pdb_file()
+        :  $self->pdbType eq 'pqs' ? $self->pdbGetFile->pqs_file()
+        :  croak "Input from file type " . $self->pdbType() . " not implemented!";
 }
 
 has 'pdbCode' => (
