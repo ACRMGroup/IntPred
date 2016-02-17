@@ -4,7 +4,7 @@ use Carp;
 use Scalar::Util qw(looks_like_number);
 
 sub testConfigFile {
-    return "configFiles/testDataSetCreator.ini";
+    return "configFiles/testIntegration.ini";
 }
 
 sub test_instanceFeatureValues {
