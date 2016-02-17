@@ -89,7 +89,6 @@ sub supplyClass {
 sub test_features {
     my $test = shift;
     my $pProc = $test->class->new($test->constructorArgs());
-print
     $pProc->model->setExpectedFeatures(qw(id pho pln SS Hb));
 
     my $inst = $pProc->nextInstance();
@@ -294,6 +293,23 @@ sub constructorArgs {
 
 sub supplyClass {
     return 'DataSet::Creator::Master';
+}
+
+sub testParallelInputConstructorArgs {
+    return map {
+        DataSet::Input->new(inputFile => "pdb$_.ent", pdbCode => $_,
+                            complexChainIDs => [ [ ['A'], ['B'] ] ] ) }
+        qw(1ors 1tpx 2wap);
+}
+
+sub test_instanceInParallel {
+    my $test = shift;
+    my $testCreator
+        = $test->class->new(childInput => [$test->testParallelInputConstructorArgs()],
+                            model => DataSet::Instance::Model->new());
+    $testCreator->maxProc(2);
+    my $classTest = all(isa"DataSet::Instance");
+    cmp_deeply([$testCreator->getInstances()], array_each($classTest));
 }
 
 1;

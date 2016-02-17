@@ -89,6 +89,15 @@ sub nextInstance {
     }
 }
 
+sub allChildren {
+    my $self = shift;
+    my @children = ();
+    while (my $child = $self->nextChild()) {
+        push(@children, $child);
+    }
+    return @children;
+}
+
 sub nextChild {
     my $self = shift;
 
@@ -123,6 +132,8 @@ use Moose;
 use MooseX::Aliases;
 use DataSet::Input;
 use Carp;
+use Parallel::ForkManager;
+use Storable;
 
 extends 'DataSet::Creator';
 use overload '""' => 'stringify';
@@ -131,6 +142,12 @@ has 'inputs' => (
     isa => 'ArrayRef[DataSet::Input]',
     is  => 'rw',
     alias => 'childInput'
+);
+
+has 'maxProc' => (
+    is => 'rw',
+    isa => 'Int',
+    default => 1,
 );
 
 sub buildChildClass {
@@ -150,10 +167,55 @@ sub getDataSet {
 sub getInstances {
     my $self = shift;
     my @instances = ();
-    while (my $instance = $self->nextInstance()) {
-        push(@instances, $instance);
+    if ($self->maxProc > 1) {
+        @instances = $self->_getInstancesInParallel();
+    }
+    else {
+        while (my $instance = $self->nextInstance()) {
+            push(@instances, $instance);
+        }
     }
     return @instances;
+}
+
+sub _getInstancesInParallel {
+    my $self = shift;
+    my @children = $self->allChildren();
+    my @childOutFiles = $self->_getTmpFilesForChildren(@children); 
+    my $pm = Parallel::ForkManager->new($self->maxProc);
+    for (my $i = 0 ; $i < @children ; ++$i) {
+        my $pid = $pm->start and next;
+        my $child = $children[$i];
+        my @instances = ();
+        while (my $instance = $child->nextInstance()) {
+            push(@instances, $instance);
+        }
+        store \@instances, $childOutFiles[$i];
+        $pm->finish;
+    }
+    $pm->wait_all_children;
+    my @instances = $self->_retrieveInstancesFromChildFiles(@childOutFiles);
+    return @instances;
+}
+
+sub _getTmpFilesForChildren {
+    my $self     = shift;
+    my @children = @_;
+    my $pID      = $$;
+    return map {"/tmp/$pID" . "child$_.instancesAref"} 0 .. @children - 1;
+}
+
+sub _retrieveInstancesFromChildFiles {
+    my $self          = shift;
+    my @childOutFiles = @_;
+    my @instances     = map {@{retrieve($_)}} @childOutFiles;
+    $self->_removeFiles(@childOutFiles);
+    return @instances;
+}
+
+sub _removeFiles {
+    my $self = shift;
+    map {unlink($_)} @_; 
 }
 
 sub stringify {
