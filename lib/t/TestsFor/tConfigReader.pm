@@ -16,6 +16,10 @@ sub getPredictorConfigFile {
     return "configFiles/predictorConfigFile.ini";
 }
 
+sub emptyConfigFile {
+    return "configFiles/emptyConfig.ini";
+}
+
 has 'class' => (default => 'ConfigReader', isa => 'Str', is => 'ro', lazy => 1);
     
 sub test_constructor {
@@ -23,6 +27,12 @@ sub test_constructor {
     can_ok $test->class, 'new';
     isa_ok my $classInstance = $test->class->new(dSetCreatorConfigFile()),
         $test->class;
+}
+
+sub test_emptyConfigFileError {
+    my $test = shift;
+    throws_ok {$test->class->new(emptyConfigFile())} qr/is empty/,
+        "empty config file caught ok";
 }
 
 sub test_getDataSet {

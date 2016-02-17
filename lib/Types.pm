@@ -1,7 +1,7 @@
 package Types;
 use Moose::Util::TypeConstraints;
 use Config::IniFiles;
-
+use Carp;
 use TCNUtil::types;
 
 subtype 'IntPred::ArrayRefOfStrings',
@@ -22,6 +22,7 @@ coerce  'IntPred::ArrayRefOfStrings',
 class_type 'Config::IniFiles';
 coerce 'Config::IniFiles',
     from 'FileReadable',
-    via {Config::IniFiles->new(-file => $_)};
+    via {croak "File $_ is empty! Config file must not be empty" if -z $_;
+         Config::IniFiles->new(-file => $_)};
 
 1;
