@@ -92,19 +92,17 @@ sub writePatchFilesToDir {
 }
 
 sub mapWEKAOutput {
-    my $self       = shift;
-    my $wekaOutput = shift;
-
+    my $self             = shift;
+    my $wekaOutputParser = shift;
     $self->instanceModel->setExpectedFeatures("predScore");
     my @scores
-        = WEKAOutputParser->new(input => $wekaOutput)->getTransformedScores();
+        = $wekaOutputParser->getTransformedScores();
     $self->_mapScoresToInstances(@scores);
 }
 
 sub _mapScoresToInstances {
     my $self   = shift;
     my @scores = @_;
-
     croak "There are not the same amount of scores as there are instances!"
         if @scores != @{$self->instancesAref};
     
