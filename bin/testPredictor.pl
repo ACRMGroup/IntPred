@@ -8,13 +8,19 @@ use ConfigReader;
 use Getopt::Long;
 
 my $modelFile;
+my $trainingArff;
+my $trainIsCompatible = 0;
+my $configFile;
+my $outCSV = "predictions.csv";
 
-GetOptions('m=s', \$modelFile);
+GetOptions('m=s', \$modelFile,
+           'r=s', \$trainingArff,
+           'i',   \$trainIsCompatible,
+           'c=s', \$configFile,
+           'o=s', \$outCSV);
 
-@ARGV or Usage();
-
-my $configFile = shift @ARGV;
-my $cReader    = ConfigReader->new($configFile);
+my $cReader = $configFile ? ConfigReader->new($configFile)
+    : ConfigReader->new();
 
 # Use cmd-line specified model file if available
 if ($modelFile) {
@@ -26,21 +32,55 @@ if ($modelFile) {
     }
 }
 
-my $predictor  = $cReader->getPredictor();
+if ($trainingArff) {
+    print "TEST: trainingARFF = $trainingArff\n";
+    if ($cReader->exists('TrainingSet', 'ARFF')) {
+        $cReader->setval('TrainingSet', 'ARFF', $trainingArff) 
+    }
+    else {
+        $cReader->newval('TrainingSet', 'ARFF', $trainingArff);
+    }
+}
 
-my $trainData  = $cReader->getTrainingSet();
+@ARGV or Usage();
+
+open(my $OUT, ">", $outCSV) or die "Cannot open output csv file $outCSV, $!";
 
 my $testArffFile = shift @ARGV;
 my $testArff     = ARFF::FileParser->new(file => $testArffFile)->parse();
-my $testData     = DataSet->new($testArff);
+
+print "Loading test data from arff ...\n";
+my $testData     = DataSet->new(arff => $testArff);
+
+print "Loading predictor  ...\n";
+my $predictor  = $cReader->getPredictor();
+print "Loading training set ...\n";
+my $trainData  = $cReader->getTrainingSet();
+$trainData->arffIsCompatible($trainIsCompatible);
 
 $predictor->trainingSet($trainData);
 $predictor->testSet($testData);
-print $predictor->predictionCSVStr();
+$predictor->runPredictor();
+$predictor->outputParser->transformPredictionScores(1);
+
+print "Printing output csv to $outCSV ...\n";
+print {$OUT} $predictor->outputParser->getCSVString();
+print "Finished!\n";
 
 sub Usage {
     print <<EOF;
-$0 configFile testARFF
+$0 [-c configFile] [-m modelFile] [-o outCSV] testARFF
+
+opts
+   -c : config.ini file. Model file and training arff can be specified here
+        rather than using -m and -r opts.
+   -r : training .arff file to standardise test set against.
+   -i : specify that training .arff supplied is already compatible with IntPred
+   -m : weka .model file.
+   -o : output predictions CSV file. Default = out.csv
+
+args
+    testARFF : test set .arff file
 EOF
     exit(1);
 }
