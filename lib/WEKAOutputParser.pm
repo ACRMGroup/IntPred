@@ -43,7 +43,7 @@ sub mapPatchID2PredInfoHref {
 
 sub getCSVString {
     my $self = shift;
-    my $str =  $self->getCSVHeader();
+    my $str =  $self->getCSVHeader() . "\n";
     $str .= $self->transformPredictionScores ? join("\n", $self->getLinesWithTransformedScores())
           : $self->getCSVLines();  
 }
