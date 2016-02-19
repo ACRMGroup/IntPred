@@ -8,20 +8,35 @@ use TCNUtil::ARFF;
 has 'instancesAref' => (
     isa      => 'ArrayRef[DataSet::Instance]',
     is       => 'rw',
-    required => 1,
+    lazy     => 1,
+    builder  => '_instancesArefFromArff'
 );
 
 has 'instanceModel'  => (
     isa      => 'DataSet::Instance::Model',
     is       => 'rw',
-    required => 1,
+    lazy     => 1,
+    builder  => '_instanceModelFromArff'
 );
 
 has 'arff' => (
     isa     => 'ARFF',
     is      => 'rw',
     builder => '_buildArff',
+    predicate => 'has_arff',
     lazy    => 1,
+);
+
+has 'arffIsCompatible' => (
+    isa => 'Bool',
+    is  => 'rw',
+    default => 0,
+);
+
+has 'lazyLoadArff' => (
+    isa => 'Bool',
+    is  => 'rw',
+    default => 0,
 );
 
 has 'expectedTypeForAttribute' => (
@@ -33,21 +48,20 @@ has 'expectedTypeForAttribute' => (
 
 sub makeArffCompatible {
     my $self = shift;
+    return 1 if $self->arffIsCompatible();
     my $arff = $self->arff();
-    
     while (my ($attrName, $attrType) = each %{$self->expectedTypeForAttribute}) {
         $arff->attributeDescriptionWithName($attrName)->type($attrType);
     }
-    
     # Convert secondary structure into four binary attributes
     my $secStructAttrName = "secondary_str";
     $arff->transAttributeWithNameToBinaryFromNominal($secStructAttrName);
+    return $self->arffIsCompatible(1);
 }
 
 sub standardizeArffUsingRefArff {
     my $self    = shift;
     my $refArff = shift;
-
     $self->arff->standardize($refArff);
 }
 
@@ -102,22 +116,33 @@ sub _mapScoresToInstances {
 around 'BUILDARGS' => sub {
     my $orig  = shift;
     my $class = shift;
-    
     if (@_ == 1 && ref $_[0] eq 'ARFF') {
-        return $class->$orig(_buildArgsFromArff($_[0]));
+        return $class->$orig(arff => $_[0]);
     }
     else {
         return $class->$orig(@_);
     }
 };
 
-sub _buildArgsFromArff {
-    my $arff = shift;
+sub BUILD {
+    my $self = shift;
+    my $args = shift;
+    if($self->has_arff && ! $self->lazyLoadArff) {
+        # Create instance model and instances now - this avoids problems when
+        # instance model is created after a change to arff
+        $self->instanceModel();
+        $self->instancesAref();
+    }
+}
 
-    my $model = DataSet::Instance::Model->new($arff);
-    my @instances = $model->instancesFromArff($arff);
+sub _instanceModelFromArff {
+    my $self = shift;
+    return DataSet::Instance::Model->new($self->arff);
+}
 
-    return (instanceModel => $model, instancesAref => \@instances);
+sub _instancesArefFromArff {
+    my $self = shift;
+    return [$self->instanceModel->instancesFromArff($self->arff)];
 }
 
 sub _buildExpectedTypeForAttribute {
@@ -135,7 +160,6 @@ sub _buildExpectedTypeForAttribute {
 
 sub _buildArff {
     my $self = shift;
-    
     my @attributeNames
         = map {$self->instanceModel->attributeNameForFeature($_)}
             @{$self->instanceModel->orderedFeatures()};
@@ -151,7 +175,6 @@ sub _buildArff {
             @{$self->instancesAref()};
 
     _mapUnlabelledValues(@arffInstances);
-
     return ARFF->new(attributeDescriptions => \@attributeDescriptions,
                      instances             => \@arffInstances);
 }
@@ -168,9 +191,7 @@ sub _dataSetInstance2ARFFInstance {
     my $self = shift;
     my $dSetInstance = shift;
     my @attributeDescriptions = @_;
-
     my @attributes = ();
-    
     for (my $i = 0 ; $i < @attributeDescriptions ; ++$i) {
         my $attrDesc = $attributeDescriptions[$i];
         my $feature  = $self->instanceModel->orderedFeatures->[$i];
