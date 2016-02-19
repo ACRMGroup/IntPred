@@ -23,9 +23,10 @@ sub test_constructor {
 sub test_getPredictionScoresForTestSet {
     my $test       = shift;
     my $tPredictor = $test->class->new(constructorArgs());
-    
-    lives_ok(sub {$tPredictor->getPredictionScoresForTestSet()},
-       "getPredictionScoresForTestSet ran");
+
+    $tPredictor->runPredictor();
+    lives_ok(sub {$tPredictor->assignPredictionScoresToTestSet()},
+       "assignPredictionScoresToTestSet ran");
     
     cmp_deeply($tPredictor->testSet->instancesAref,
                array_each(methods(has_predScore => 1)),
