@@ -7,7 +7,6 @@ use Types;
 has 'input' => (
     is => 'rw',
     isa => 'IntPred::ArrayRefOfStrings',
-    required => 1,
     coerce => 1,
 );
 
@@ -31,9 +30,7 @@ around BUILDARGS => sub {
 
 sub mapPatchID2PredInfoHref {
     my $self = shift;
-
     my %map = ();
-
     foreach my $line ($self->getLinesFromCSVFile()) {
         my $infoAref = $self->parseCSVLine($line);
         my ($patchID, $value, $prediction, $score) = @{$infoAref}; 
@@ -44,33 +41,58 @@ sub mapPatchID2PredInfoHref {
     return %map;
 }
 
+sub getCSVString {
+    my $self = shift;
+    my $str =  $self->getCSVHeader();
+    $str .= $self->transformPredictionScores ? join("\n", $self->getLinesWithTransformedScores())
+          : $self->getCSVLines();  
+}
+
 sub getTransformedScores {
     my $self = shift;
-    
     return map {$self->getTransformedScoreFromLine($_)}
-        $self->getLinesFromCSVFile();
+        $self->getCSVLines();
+}
+
+sub getLinesWithTransformedScores {
+    my $self = shift;
+    map {$self->transformScoreInLine($_)} $self->getCSVLines();    
+}
+
+sub transformScoreInLine {
+    my $self = shift;
+    my $line = shift;
+    my $predictionInfoAref = $self->parseCSVLine($line);
+    my $predictedLabel     = $predictionInfoAref->[2];
+    my $score              = $predictionInfoAref->[3];
+    $predictionInfoAref->[3] = $self->_transformScore($predictedLabel, $score);
+    return $self->reformCSVLineFromInfoAref($predictionInfoAref);
+}
+
+sub reformCSVLineFromInfoAref {
+    my $self = shift;
+    my $infoAref = shift;
+    my ($patchID, $value, $prediction, $score, $inst) = @{$infoAref};
+    return join(",", ($inst, $value, $prediction, "", $score, $patchID));
 }
 
 sub getTransformedScoreFromLine {
     my $self = shift;
     my $line = shift;
-    
     my $predictionInfoAref = $self->parseCSVLine($line);
     my $predictedLabel     = $predictionInfoAref->[2];
     my $score              = $predictionInfoAref->[3];
-
     return $self->_transformScore($predictedLabel, $score);
 }
 
 sub _transformScore {
     my $self = shift;
     my ($label, $score) = @_;
-    
     return $self->transformPredictionScores && $label eq '2:S' ? $score - 0.5
         : $score;
 }
 
-sub getLinesFromCSVFile {
+sub getCSVLines {
     my $self = shift;
     
     my @csvLines = ();
@@ -102,10 +124,9 @@ sub getCSVHeader {
 sub parseCSVLine {
     my $self = shift;
     my $line = shift;
-    
     chomp $line;
     my ($inst, $value, $prediction, $err, $score, $patchID) = split(",", $line);
-    return [$patchID, $value, $prediction, $score];
+    return [$patchID, $value, $prediction, $score, $inst];
 }
 
 
