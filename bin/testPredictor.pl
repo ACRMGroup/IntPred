@@ -33,7 +33,6 @@ if ($modelFile) {
 }
 
 if ($trainingArff) {
-    print "TEST: trainingARFF = $trainingArff\n";
     if ($cReader->exists('TrainingSet', 'ARFF')) {
         $cReader->setval('TrainingSet', 'ARFF', $trainingArff) 
     }
@@ -43,28 +42,17 @@ if ($trainingArff) {
 }
 
 @ARGV or Usage();
+my $testArffFile = shift @ARGV;
 
 open(my $OUT, ">", $outCSV) or die "Cannot open output csv file $outCSV, $!";
 
-my $testArffFile = shift @ARGV;
-my $testArff     = ARFF::FileParser->new(file => $testArffFile)->parse();
-
-print "Loading test data from arff ...\n";
-my $testData     = DataSet->new(arff => $testArff);
-
-print "Loading predictor  ...\n";
-my $predictor  = $cReader->getPredictor();
-print "Loading training set ...\n";
-my $trainData  = $cReader->getTrainingSet();
-$trainData->arffIsCompatible($trainIsCompatible);
-
-$predictor->trainingSet($trainData);
-$predictor->testSet($testData);
+my $predictor = preparePredictor($testArffFile, $trainIsCompatible, $cReader);
 $predictor->runPredictor();
-$predictor->outputParser->transformPredictionScores(1);
+my $outParser = $predictor->outputParser();
+$predictor->outputParser->transformPredictionScores();
 
 print "Printing output csv to $outCSV ...\n";
-print {$OUT} $predictor->outputParser->getCSVString();
+$predictor->outputParser->printCSVString($OUT);
 print "Finished!\n";
 
 sub Usage {
@@ -84,3 +72,28 @@ args
 EOF
     exit(1);
 }
+
+sub preparePredictor {
+    my ($testArffFile, $trainIsCompatible, $cReader) = @_;
+    my ($trainData, $testData)
+        = loadDataSets($testArffFile, $trainIsCompatible, $cReader);
+
+    print "Loading predictor  ...\n";
+    my $predictor  = $cReader->getPredictor();
+    $predictor->trainingSet($trainData);
+    $predictor->testSet($testData);
+    return $predictor;
+}
+
+sub loadDataSets {
+    my ($testArffFile, $trainIsCompatible, $cReader) = @_;
+    my $testArff = ARFF::FileParser->new(file => $testArffFile)->parse();
+    print "Loading test data from arff ...\n";
+    my $testData = DataSet->new(arff => $testArff);
+    print "Loading training set ...\n";
+    my $trainData  = $cReader->getTrainingSet();
+    $trainData->arffIsCompatible($trainIsCompatible);
+    return($trainData, $testData);
+}
+
+
