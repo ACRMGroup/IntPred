@@ -95,8 +95,7 @@ sub mapWEKAOutput {
     my $self             = shift;
     my $wekaOutputParser = shift;
     $self->instanceModel->setExpectedFeatures("predScore");
-    my @scores
-        = $wekaOutputParser->getTransformedScores();
+    my @scores = $wekaOutputParser->getScores();
     $self->_mapScoresToInstances(@scores);
 }
 
