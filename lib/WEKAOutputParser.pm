@@ -10,10 +10,10 @@ has 'input' => (
     coerce => 1,
 );
 
-has 'transformPredictionScores' => (
+has 'hasTransformedPredictionScores' => (
     is => 'rw',
     isa => 'Bool',
-    default => 1,
+    default => 0,
 );
 
 around BUILDARGS => sub {
@@ -41,22 +41,54 @@ sub mapPatchID2PredInfoHref {
     return %map;
 }
 
+sub transformPredictionScores {
+    my $self = shift;
+    return 1 if $self->hasTransformedPredictionScores();
+    my $reachedHeader = 0;
+    for (my $i = 0 ; $i < @{$self->input} ; ++$i) {
+        my $line = $self->input->[$i];
+        if (! $reachedHeader) {
+            $reachedHeader = 1 if $line =~ /^inst#/;
+            next;
+        }
+        next if $line =~ /^\s*$/xms;
+        $self->input->[$i] = $self->transformScoreInLine($line);
+    }
+    $self->hasTransformedPredictionScores(1);
+}
+
 sub getCSVString {
     my $self = shift;
-    my $str =  $self->getCSVHeader() . "\n";
-    $str .= $self->transformPredictionScores ? join("\n", $self->getLinesWithTransformedScores())
-          : $self->getCSVLines();  
+    return join("", @{$self->input});
 }
 
-sub getTransformedScores {
+sub printCSVString {
     my $self = shift;
-    return map {$self->getTransformedScoreFromLine($_)}
-        $self->getCSVLines();
+    my $FH   = shift;
+    print {$FH} @{$self->input};
 }
 
-sub getLinesWithTransformedScores {
+sub getScores {
     my $self = shift;
-    map {$self->transformScoreInLine($_)} $self->getCSVLines();    
+    my @scores = ();
+    $self->transformPredictionScores();
+    my $reachedHeader = 0;
+    for (my $i = 0 ; $i < @{$self->input} ; ++$i) {
+        my $line = $self->input->[$i];
+        if (! $reachedHeader) {
+            $reachedHeader = 1 if $line =~ /^inst#/;
+            next;
+        }
+        next if $line =~ /^\s*$/xms;
+        push(@scores, $self->getScoreFromLine($line));
+    }
+    return @scores;
+}
+
+sub getScoreFromLine {
+    my $self = shift;
+    my $line = shift;
+    return $self->parseCSVLine($line)->[3];
 }
 
 sub transformScoreInLine {
@@ -88,26 +120,7 @@ sub getTransformedScoreFromLine {
 sub _transformScore {
     my $self = shift;
     my ($label, $score) = @_;
-    return $self->transformPredictionScores && $label eq '2:S' ? $score - 0.5
-        : $score;
-}
-
-sub getCSVLines {
-    my $self = shift;
-    
-    my @csvLines = ();
-
-    my $reachedHeader = 0;
-    
-    foreach my $line (@{$self->input}) {
-        if (! $reachedHeader) {
-            $reachedHeader = 1 if $line =~ /^inst#/;
-            next;
-        }
-        next if $line =~ /^\s*$/xms;
-        push(@csvLines, $line);
-    }
-    return @csvLines;
+    return $label eq '2:S' ? $score - 0.5 : $score;
 }
 
 sub getCSVHeader {
