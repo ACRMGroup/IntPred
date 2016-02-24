@@ -76,19 +76,27 @@ sub getInstanceLabels {
 }
 
 sub writePatchFilesToDir {
-    my $self = shift;
-    my $dir  = shift;
-    
-    my %instancesForPDB = ();
-    push(@{$instancesForPDB{[split(":", $_->id)]->[0]}}, $_)
-        foreach $self->getInstances();
-
+    my $self         = shift;
+    my $dir          = shift;
+    my $groupByChain = shift;
+    $groupByChain = 0 if ! defined $groupByChain;
+    my %instancesForPDB = %{$self->_getGroupInstanceHref($groupByChain)};
     while (my ($pdbCode, $instanceAref) = each %instancesForPDB) {
         my $outFile = "$dir/" . $pdbCode . ".patches";
         open(my $OUT, ">", $outFile) or die "Cannot open file $outFile, $!";
         print {$OUT} map {$_->summary} @{$instanceAref};
         close  $OUT;
     }
+}
+
+sub _getGroupInstanceHref {
+    my $self = shift;
+    my $groupByChain = shift;
+    my %hash = ();
+    my $method = $groupByChain ? "getPDBID" : "getPDBCode";
+    push(@{$hash{$_->$method}}, $_)
+        foreach $self->getInstances();
+    return \%hash;
 }
 
 sub mapWEKAOutput {
