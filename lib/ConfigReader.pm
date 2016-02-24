@@ -25,7 +25,7 @@ has 'config' => (
 around 'val' => sub {
     my $orig  = shift;
     my $class = shift;
-    croak "Value for section $_[0], parameter $_[1] is not defined!"
+    confess "Value for section $_[0], parameter $_[1] is not defined!"
         if ! $class->exists(@_);
     return $class->$orig(@_);
 };
