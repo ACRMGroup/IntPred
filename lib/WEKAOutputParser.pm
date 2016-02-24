@@ -31,12 +31,17 @@ around BUILDARGS => sub {
 sub mapPatchID2PredInfoHref {
     my $self = shift;
     my %map = ();
-    foreach my $line ($self->getLinesFromCSVFile()) {
+    my $reachedHeader = 0;
+    foreach my $line (@{$self->input}) {
+        if (! $reachedHeader) {
+            $reachedHeader = 1 if $line =~ /^inst#/;
+            next;
+        }
         my $infoAref = $self->parseCSVLine($line);
         my ($patchID, $value, $prediction, $score) = @{$infoAref}; 
         $map{$patchID}
             = {value => $value, prediction => $prediction,
-               score => $self->getTransformedScoreFromLine($line)};
+               score => $score};
     }
     return %map;
 }
