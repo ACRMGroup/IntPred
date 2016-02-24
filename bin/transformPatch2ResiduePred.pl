@@ -48,21 +48,23 @@ my $resIDLabelFile = shift @ARGV;
 ################################################################################
 
 my %resID2LabelMap = mapResID2Label($resIDLabelFile);
+print scalar (keys %resID2LabelMap) . " residues found in resID label file\n";
 
 my $csvParser
     = WEKAOutputParser->new(input => $inputCSV,
-                            transformPredictionScores => ! $predScoresAlreadyTransformed);
+                            hasTransformedPredictionScores => $predScoresAlreadyTransformed);
+$csvParser->transformPredictionScores() if ! $predScoresAlreadyTransformed;
 
 my %patchID2PredMap   = $csvParser->mapPatchID2PredInfoHref();
+print scalar (keys %patchID2PredMap) . " patch predictions found in prediction .csv\n";
 
 my %patchID2ResSeqMap = mapPatchID2ResSeq($patchesDir);
+print scalar (keys %patchID2ResSeqMap) . " patches found in patch dir\n";
 
 my %resID2PredAndValueMap
     = resID2PredAndValue(\%patchID2PredMap, \%patchID2ResSeqMap, $option,
                          $scoreThresh);
 
-print scalar (keys %resID2PredAndValueMap) . " residues found in patches\n";
-print scalar (keys %resID2LabelMap) . " residues found in resID label file\n";
 
 ammendValueLabels(\%resID2PredAndValueMap, \%resID2LabelMap,
                   $includeNonPatchResidues, $excludeNonLabelledResidues);
@@ -91,6 +93,7 @@ sub printCSV {
                        $error, $infoHref->{score}, $resID);
 
         print join(",", @ordered) . "\n";
+        ++$i;
     }
 }
 
@@ -120,7 +123,7 @@ sub ammendValueLabels {
                 = $resID2LabelHref->{$resID};
         }
     }
-
+    
     if ($excludeNonLabelledResidues) {
         foreach my $resID (keys %{$resID2PredAndValueHref}) {
             delete $resID2PredAndValueHref->{$resID}
@@ -269,11 +272,11 @@ sub mapPatchID2ResSeq {
 
 sub parsePatchLine {
     my $line = shift;
-
     # example line: <patch A.24> A:23 A:24 A:25 A:26 A:27 A:28
     my ($chainID) = $line =~ /patch (\w+)\./g;
-    my @resSeqs   = $line =~ /[:.](\w+)/g;
-
+    my @resSeqs   = $line =~ /[:.](-*\w+)/g;
+    croak "chain ID was not parsed from patch line: $line\n" if ! $chainID;
+    croak "resSeqs were not parsed from patch line: $line\n" if ! @resSeqs;
     return ($chainID, @resSeqs);
 }
 
