@@ -99,11 +99,15 @@ sub ammendValueLabels {
     my $resID2LabelHref            = shift;
     my $includeNonPatchResidues    = shift;
     my $excludeNonLabelledResidues = shift;
+
+    my %presentPDBIDs = getPDBIDHash($resID2PredAndValueHref);
     
     foreach my $resID (keys %{$resID2LabelHref}) {
         if (! exists $resID2PredAndValueHref->{$resID}) {
             
             next unless $includeNonPatchResidues;
+            my ($pdbID) = $resID =~ /(.*:?):/;
+            next unless exists $presentPDBIDs{$pdbID};
             
             # Add resID to map
             $resID2PredAndValueHref->{$resID}
@@ -123,6 +127,11 @@ sub ammendValueLabels {
                 if ! exists $resID2LabelHref->{$resID};
         }
     }
+}
+
+sub getPDBIDHash {
+    my $inHref = shift;
+    return map {$_ => 1} map {/(.*:?):/} keys %{$inHref};
 }
 
 sub mapResID2Label {
