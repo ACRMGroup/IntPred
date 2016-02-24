@@ -92,6 +92,21 @@ sub getLabel {
     return join(":", ($self->id, $self->class));
 }
 
+sub getPDBCode {
+    my $self = shift;
+    return [split(":", $_->id)]->[0];
+}
+
+sub getChainID {
+    my $self = shift;
+    return [split(":", $_->id)]->[1];
+}
+
+sub getPDBID {
+    my $self = shift;
+    return $self->getPDBCode() . $self->getChainID();
+}
+
 ################################# END OF CLASS #################################
 ################################################################################
 
