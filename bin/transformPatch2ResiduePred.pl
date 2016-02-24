@@ -277,7 +277,7 @@ residues can be controlled via the options.
 ARGS:
   inputCSV: output WEKA csv file containing patch predictions.
   patchesDir: directory of .patch files that contain patch summary lines.
-  residueLabelFile: file of line format pdbCode::chainID::resSeq::label,
+  residueLabelFile: file of line format pdbCode:chainID:resSeq:label,
                     where label = 0 if residue is surface and 1 if interface.
 
 OPTS:
