@@ -165,7 +165,7 @@ sub _getPathForVal {
 
 sub _getConfigDir {
     my $self = shift;
-    croak "config has no file name! Was a config file supplied?"
+    confess "config has no file name! Was a config file supplied?"
         if ! $self->config->GetFileName;
     my ($fName, $configDir, $suffix) = fileparse($self->config->GetFileName);
     return $configDir;
