@@ -91,8 +91,8 @@ sub addTestSetInputFileAndFormat {
     my ($inFile, $format) = @_;
     # Make sure that input file is an absolute path
     my $inFileAbsPath = File::Spec->rel2abs($inFile);
-    $self->newval(qw(TestSet inFile       $inFileAbsPath));
-    $self->newval(qw(TestSet inFileFormat $format));
+    $self->newval(qw(TestSet inFile), $inFileAbsPath);
+    $self->newval(qw(TestSet inFileFormat), $format);
 }
 
 sub createInputs {
