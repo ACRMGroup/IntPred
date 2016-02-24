@@ -67,10 +67,12 @@ sub createInstanceModel {
 
     my $model
         = DataSet::Instance::Model->new(
-            propCalc        => $self->createPropCalc(),
             orderedFeatures => [$self->getFeatures()]
         );
 
+    $model->propCalc($self->createPropCalc())
+        if grep {/^pro$/} $self->getFeatures();
+    
     $model->userLabels($self->readLabelsFile())
         if $self->exists(qw(TestSet labelsFile));
 
