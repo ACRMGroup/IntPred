@@ -241,12 +241,15 @@ sub mapPatchID2ResSeq {
     
     while (my $fileName = readdir($DH)) {
         next if $fileName =~ /^\./;
-        my $pdbCode = substr($fileName, 0, 4);
-
+        my ($pdbCode) = $fileName =~ /(.*)\.patches/;
+        chop $pdbCode;
+        
         my $filePath = "$patchesDir/$fileName";
         open(my $IN, "<", $filePath) or die "Cannot open file $filePath, $!";
 
         while (my $line = <$IN>) {
+            chomp $line;
+            next if ! $line;
             my ($chainID, $patchCentre, @resSeqs) = parsePatchLine($line);
             my $patchID = join(":", (lc($pdbCode), $chainID, $patchCentre));
             $map{$patchID} = \@resSeqs;
