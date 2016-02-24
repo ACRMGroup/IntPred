@@ -143,6 +143,12 @@ sub getTrainingSetARFF {
     return $self->_getPathForVal(qw(TrainingSet ARFF))
 }
 
+sub setFeatures {
+    my $self = shift;
+    my @features = @_;
+    $self->newval(qw(DataSetCreation features), @features);
+}
+
 sub getFeatures {
     my $self     = shift;
     my @features = $self->val(qw(DataSetCreation features));
