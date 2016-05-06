@@ -110,7 +110,6 @@ sub nextChild {
     my $child = $self->childClass->new(@arg);
 
     print "$self - new child $child\n";
-    
     $self->_inc_iter();
     return $child;
 }
@@ -270,7 +269,8 @@ sub stringify {
 sub _getArgFromInput {
     my $input = shift;
 
-    my $pdb = pdb->new(pdb_file => $input->inputFile);
+    my $pdb = pdb->new(pdb_file => $input->inputFile,
+                       het_atom_cleanup => 1);
     $pdb->pdb_code($input->pdbCode) if $input->has_pdbCode();
     
     return (pdb => $pdb, complexChainIDs => $input->complexChainIDs);
@@ -532,16 +532,34 @@ sub buildPatches {
                      @{$self->model->pSummaries->{$pdbID}} ];
     }
     else {
-            my $ap = automatic_patches->new(pdb_object => $self->chain,
-                                            patch_type => 'normal',
-                                            radius => $self->model->patchRadius,
-                                            ASA_type => 'ASAb',
-                                            build_patches_from_parent => 1,
-                                        );
-            return [$ap->get_patches];
+        my $ap = automatic_patches->new(
+            pdb_object => $self->chain,              patch_type => 'normal',
+            radius     => $self->model->patchRadius, ASA_type   => 'ASAb',
+            build_patches_from_parent => 1 );
+        return [$ap->get_patches($self->_getGetPatchesArgs())];
     }
 }
 
+sub _getGetPatchesArgs {
+    my $self = shift;
+    my %arg = ();
+    if ($self->model->haspCentres) {
+        my $pdbCode = $self->chain->pdb_code;
+        my $chainID = $self->chain->chain_id;
+        my $resSeqAndAtomNameArefs = $self->model->pCentres->{$pdbCode}->{$chainID};
+        my @patchCentres = map {$self->chain->getAtomFromResSeqAndAtomName(@{$_})}
+            $self->_filterOutNoCAResSeqs($resSeqAndAtomNameArefs);
+        
+        $arg{patch_centres} = \@patchCentres;
+    }
+    return %arg;
+}
+
+sub _filterOutNoCAResSeqs {
+    my $self = shift;
+    my $resSeqAndAtomNameArefs = shift;
+    return grep {$self->chain->doesResSeqHaveCA($_->[0])} @{$resSeqAndAtomNameArefs};
+}    
 sub buildChildClass {
     return "DataSet::Creator::Patch";
 }
