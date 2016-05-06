@@ -232,6 +232,13 @@ has 'pSummaries' => (
     predicate => 'haspSummaries',
 );
 
+has 'pCentres' => (
+    is => 'rw',
+    isa => 'IntPred::pCentresHashRef',
+    predicate => 'haspCentres',
+    coerce => 1,
+);
+
 has 'userLabels' => (
     is => 'rw',
     isa => 'HashRef',
