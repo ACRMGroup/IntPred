@@ -78,6 +78,9 @@ sub createInstanceModel {
 
     $model->pSummaries($self->readPatchDir())
         if $self->exists(qw(TestSet patchDir));
+
+    $model->pCentres($self->val(qw(DataSetCreation pCentreDir)))
+        if $self->exists(qw(DataSetCreation pCentreDir));
     
     return $model;
 }
