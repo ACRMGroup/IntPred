@@ -312,4 +312,18 @@ sub test_instanceInParallel {
     cmp_deeply([$testCreator->getInstances()], array_each($classTest));
 }
 
+sub test_patchesFrompCentres {
+    my $test = shift;
+    my $testCreator
+        = $test->class->new(childInput => [_getPatchesFrompCentresInputArg()],
+                            model => DataSet::Instance::Model->new(pCentres => "testPatchCentres"));
+    my @gotInstances = $testCreator->getInstances();
+    is(scalar @gotInstances, 4, "expected numbr of instances returned");
+}
+
+sub _getPatchesFrompCentresInputArg {
+    return DataSet::Input->new(inputFile => "1n4p_1.mmol", pdbCode => "1n4p_1",
+                               complexChainIDs => [ [ ['B'], [] ] ]);
+}
+
 1;
