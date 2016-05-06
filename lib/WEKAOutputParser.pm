@@ -73,6 +73,22 @@ sub printCSVString {
     print {$FH} @{$self->input};
 }
 
+sub getCSVLines {
+    my $self = shift;
+    my @lines = ();
+    my $reachedHeader;
+    for (my $i = 0 ; $i < @{$self->input} ; ++$i) {
+        my $line = $self->input->[$i];
+        if (! $reachedHeader) {
+            $reachedHeader = 1 if $line =~ /^inst#/;
+            next;
+        }
+        next if $line =~ /^\s*$/xms;
+        push(@lines, $line);
+    }
+    return @lines;
+}
+
 sub getScores {
     my $self = shift;
     my @scores = ();
