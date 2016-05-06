@@ -97,7 +97,14 @@ sub test_instancesFromArff {
                _expValueForFeatureHref(),
                "first instance has correct features and values");
 }
-        
+
+sub test_pCentres {
+    my $test = shift;
+    my $testpCentreDir = "testPatchCentres";
+    isa_ok my $tModel = $test->class->new(pCentres => $testpCentreDir),
+        $test->class(), "";
+}
+
 sub _expValueForFeatureHref {
     return {id    => '1a2y:C:100',
             pro   => '-0.197333',
