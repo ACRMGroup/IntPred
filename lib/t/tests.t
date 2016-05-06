@@ -1,8 +1,16 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
 use lib ('..');
 use Test::Class::Moose::Load qw(TestsFor);
 use Test::Class::Moose::Runner;
 use Getopt::Long;
 my $numJobs = 1;
-GetOptions("j=i", \$numJobs);
-Test::Class::Moose::Runner->new(test_classes => \@ARGV, jobs => $numJobs)->runtests();
+my $includeRE;
+
+GetOptions("j=i", \$numJobs,
+           "i=s", \$includeRE);
+my %arg = (test_classes => \@ARGV, jobs => $numJobs);
+$arg{include} = qr/$includeRE/ if defined $includeRE;
+
+Test::Class::Moose::Runner->new(%arg)->runtests();
