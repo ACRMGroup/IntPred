@@ -23,7 +23,7 @@ croak "Error trying to parse CSV $CSVs[0]:" . $@ if ! $header;
 
 my @alLines = ();
 foreach my $CSV (@CSVs) {
-    my @lines = WEKAOutputParser->new($CSV)->getLinesFromCSVFile();
+    my @lines = WEKAOutputParser->new($CSV)->getCSVLines();
     push(@alLines, @lines);
 }
 
