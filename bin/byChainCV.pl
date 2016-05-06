@@ -43,8 +43,14 @@ my %test2trainpdbIDs = mapTest2TrainpdbIDs(keys %pdbID2dataLines);
 my %pdbID2balancedLines = ();
 if ($balance) {
     # Create balanced sets of lines for each pdbID
-    %pdbID2balancedLines
-        = map {$_ => balanceLines($pdbID2dataLines{$_}, $labelDist)} keys %pdbID2dataLines;
+    foreach my $pdbID (keys %pdbID2dataLines) {
+        my $ret = eval {$pdbID2balancedLines{$pdbID}
+                            = balanceLines($pdbID2dataLines{$pdbID}, $labelDist);
+                        1};
+        if (! $ret) {
+            print "WARNING: unable to balance pdbID $pdbID, skipping ...\n";
+        }
+    }
 }
 
 # If training dataset needs to be balanced, send balanced line arrays for
@@ -266,8 +272,6 @@ sub balanceLines {
     my @intfLines = grep {/,I$/} @{$lineAref};
     my @surfLines = grep {/,S$/} @{$lineAref};
 
-    use Data::Dumper;
-    print Dumper $lineAref;
     croak "No interface instances found!" if ! @intfLines;
     croak "No surface instances found!"   if ! @surfLines;
     
@@ -286,10 +290,18 @@ sub mapTestpdbID2trainingInstanceLines {
     my $pdbID2partitionHref = shift;
     
     my %pdbID2partitionLineAref = ();
-    
+
     foreach my $pdbID (keys %{$pdbID2partitionHref}) {
         my $partition = $pdbID2partitionHref->{$pdbID};
-        my @lineArefs = map {$pdbID2dataLinesHref->{$_}} @{$partition};
+        my @lineArefs = ();
+        foreach my $partitionID (@{$partition}) {
+            if (exists $pdbID2dataLinesHref->{$partitionID}) {
+                push(@lineArefs, $pdbID2dataLinesHref->{$partitionID});
+            }
+            else {
+                print "WARNING: no partition found for $partitionID\n";
+            }
+        }
         # Collapse each array ref into array of lines
         my @lines = map { @{$_} } @lineArefs;
         $pdbID2partitionLineAref{$pdbID} = \@lines;
