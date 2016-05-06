@@ -21,12 +21,16 @@ my $scoreThresh;
 my $includeNonPatchResidues = 0;
 my $excludeNonLabelledResidues = 1;
 my $predScoresAlreadyTransformed = 0;
+my $continueOnMapFailure = 0;
+
 GetOptions("m"   => \$minimal,
            "v"   => \$vote,
            "s"   => \$scoreAverage,
            "t=f" => \$scoreThresh,
            "n"   => \$includeNonPatchResidues,
-           "a"   => \$predScoresAlreadyTransformed);
+           "a"   => \$predScoresAlreadyTransformed,
+           "f"  =>  \$continueOnMapFailure,
+       );
 
 $scoreThresh = 0.5 if ! $scoreThresh;
 
@@ -63,8 +67,7 @@ print scalar (keys %patchID2ResSeqMap) . " patches found in patch dir\n";
 
 my %resID2PredAndValueMap
     = resID2PredAndValue(\%patchID2PredMap, \%patchID2ResSeqMap, $option,
-                         $scoreThresh);
-
+                         $scoreThresh, $continueOnMapFailure);
 
 ammendValueLabels(\%resID2PredAndValueMap, \%resID2LabelMap,
                   $includeNonPatchResidues, $excludeNonLabelledResidues);
@@ -164,6 +167,7 @@ sub resID2PredAndValue {
     my $patchID2ResSeqMap  = shift;
     my $option = shift;
     my $scoreThresh = shift;
+    my $continueOnMapFailure = shift;
     
     my %resID2PredAndValue = ();
 
@@ -173,7 +177,8 @@ sub resID2PredAndValue {
         
         my @resSeqs = eval { @{$patchID2ResSeqMap->{$patchID}} };
         if (! @resSeqs) {
-            croak "No patchID => resSeq mapping exists for patch $patchID!";
+            my $message = "No patchID => resSeq mapping exists for patch $patchID\n";
+            $continueOnMapFailure ? print $message : croak $message;
         }
         
         foreach my $resSeq (@resSeqs) {
@@ -282,7 +287,7 @@ sub parsePatchLine {
 
 sub Usage {
     print <<EOF;
-$0 [-m -v -s] -n -t NUM inputCSV patchesDir residueLabelFile
+$0 [-m -v -s] [-n] [-t NUM] [-f] [-a] inputCSV patchesDir residueLabelFile
 
 This script transforms per-patch to per-residue predictions.
 Patches are mapped to their constituent residues and then patch
@@ -308,9 +313,14 @@ OPTS:
 
   -n : Include residues that not found in any patches but are listed in intput
        residue label file. Patches will automatically be predicted negative.
+       Residues will only be included from chains that have at least one patch
+       prediction.
 
   -a : Use this flag if prediction scores in inputCSV have already been
        transformed to range from  0-1, rather than WEKA default of 0.5-1.
+
+  -f : force script to run even if there are missing patch summaries in patch
+       files provided. Warning message will be printed for each missing summary.
 EOF
     exit(1);
 }
