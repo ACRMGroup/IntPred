@@ -1,6 +1,11 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Getopt::Long;
+
+my $noStats = 0;
+
+GetOptions("n", \$noStats);
 
 @ARGV or die "Please supply some run prediction csvs\n";
 
@@ -35,17 +40,19 @@ foreach my $file (@ARGV) {
     }
 }
 
+my @outFiles;
+
 foreach my $chID (keys %lineMap) {
     foreach my $run (keys %{$lineMap{$chID}}) {
         my $outFile = "$chID.run$run.csv";
+	push(@outFiles, $outFile);
         open(my $OUT, ">", $outFile) or die "Cannot open file $outFile, $!";
         my @lines = @{$lineMap{$chID}->{$run}};
         print {$OUT} $header, @lines;
         close $OUT;
-        print "$chID, run $run\n",
-            `calcStatsFromWEKAOutputCSV.pl -U ? S I $outFile`,
-            "\n";
     }
 }
+
+print `calcStatsFromWEKAOutputCSV.pl -c -U ? S I @outFiles` unless $noStats;
 
  
