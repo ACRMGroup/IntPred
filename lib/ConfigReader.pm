@@ -81,6 +81,9 @@ sub createInstanceModel {
 
     $model->pCentres($self->val(qw(DataSetCreation pCentreDir)))
         if $self->exists(qw(DataSetCreation pCentreDir));
+
+    $model->interfaceResIDs($self->readInterfaceResIDsFile)
+        if $self->exists(qw(DataSetCreation interfaceResIDsFile));
     
     return $model;
 }
@@ -188,6 +191,21 @@ sub readLabelsFile {
         $pID2label{$patchID} = $label;
     }
     return \%pID2label;
+}
+
+sub readInterfaceResIDsFile {
+    my $self = shift;
+    my $interfaceResIDsFile = $self->_getPathForVal(qw(DataSetCreation interfaceResIDsFile));
+    my %pdb2InterfaceResIDAref = ();
+    open(my $IN, "<", $interfaceResIDsFile)
+        or die "Cannot open file $interfaceResIDsFile, $!";
+    while (my $line = <$IN>) {
+        chomp $line;
+        # example line = 2wap:A:102
+        my ($pdbCode, $chainID, $resSeq) = split(/:/, $line);
+        push(@{$pdb2InterfaceResIDAref{"$pdbCode$chainID"}}, "chainID.$resSeq");
+    }
+    return \%pdb2InterfaceResIDAref;    
 }
 
 sub readPatchDir {

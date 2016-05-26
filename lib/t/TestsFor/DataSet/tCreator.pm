@@ -29,10 +29,19 @@ sub buildChain {
 has 'pSummaries' => (isa => 'HashRef', is => 'ro', lazy => 1,
                      builder => 'buildpSummaries');
 
+has 'interfaceResIDs' => (isa => 'HashRef', is => 'ro', lazy => 1,
+                          builder => 'buildInterfaceResIDs');
+
 sub buildpSummaries {
     my $self = shift;
     my $pdbID = $self->pdbCode . $self->chainID;
     my $pSummaries = {$pdbID => ["<patch A.103> A:101 A:102 A:103"]};
+}
+
+sub buildInterfaceResIDs {
+    my $self = shift;
+    my %hash = ("2wapA", [qw(A:101 A:102)]); 
+    return \%hash;
 }
 
 has 'patch' => (
@@ -258,6 +267,15 @@ sub test_interfaceResidues {
     my $cProc = $test->class->new($test->constructorArgs());
 
     ok($cProc->interfaceResidues, "interfaceResidues ok");
+}
+
+# Test to make sure interface residues are taken from model if available
+sub test_interfaceResiduesFromModel {
+    my $test = shift;
+    my $cProc = $test->class->new($test->constructorArgs());
+    $cProc->model->interfaceResIDs($test->interfaceResIDs);
+    cmp_deeply([sort keys %{$cProc->interfaceResidues}], [qw(A:101 A:102)],
+               "interfaceResidues taken from model ok");
 }
 
 sub test_features {

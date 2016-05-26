@@ -247,6 +247,12 @@ has 'userLabels' => (
     predicate => 'hasUserLabels',
 );
 
+has 'interfaceResIDs' => (
+    is => 'rw',
+    isa => 'HashRef',
+    predicate => 'hasInterfaceResIDs'
+);
+
 has 'featureStr' => (
     is => 'rw',
     isa => 'Str',

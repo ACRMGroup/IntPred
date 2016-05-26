@@ -51,7 +51,10 @@ sub makeArffCompatible {
     return 1 if $self->arffIsCompatible();
     my $arff = $self->arff();
     while (my ($attrName, $attrType) = each %{$self->expectedTypeForAttribute}) {
-        $arff->attributeDescriptionWithName($attrName)->type($attrType);
+        my $attrDesc = $arff->attributeDescriptionWithName($attrName);
+        # Skip any attributes that are not present in the arff
+        next if ! $attrDesc;
+        $attrDesc->type($attrType);
     }
     # Convert secondary structure into four binary attributes
     my $secStructAttrName = "secondary_str";

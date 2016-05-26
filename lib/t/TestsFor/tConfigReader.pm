@@ -20,6 +20,10 @@ sub emptyConfigFile {
     return "configFiles/emptyConfig.ini";
 }
 
+sub interfaceResIDsConfigFile {
+    "configFiles/testUserInterfaceResIDs.ini";
+}
+
 has 'class' => (default => 'ConfigReader', isa => 'Str', is => 'ro', lazy => 1);
     
 sub test_constructor {
@@ -57,6 +61,19 @@ sub test_createDataSetCreator {
     my $test = shift;
 
     my $tConfigReader   = $test->class->new(dSetCreatorConfigFile());
+    my $tDataSetCreator = $tConfigReader->createDataSetCreator();  
+    isa_ok($tDataSetCreator, 'DataSet::Creator::Master',
+           'createDataSetCreator returns a DataSet::Creator::Master');
+
+    my $tDataSet = $tDataSetCreator->getDataSet();
+    isa_ok($tDataSetCreator, 'DataSet::Creator::Master',
+           'and this DataSet::Creator can return a DataSet');
+}
+
+sub test_createDataSetCreatorWithInterfaceResIDs {
+    my $test = shift;
+
+    my $tConfigReader   = $test->class->new(interfaceResIDsConfigFile());
     my $tDataSetCreator = $tConfigReader->createDataSetCreator();  
     isa_ok($tDataSetCreator, 'DataSet::Creator::Master',
            'createDataSetCreator returns a DataSet::Creator::Master');

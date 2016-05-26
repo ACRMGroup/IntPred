@@ -58,7 +58,7 @@ sub calcAvgScoreFromResIDs {
     
     my $total = 0;
     map {$total += $resID2ScoreHref->{$_}} @{$inst->resIDs};
-    return $total / scalar @{$inst->resIDs};    
+    return $total / scalar @{$inst->resIDs};
 }
 
 sub nextInstance {
@@ -281,6 +281,7 @@ use Moose;
 use MooseX::Aliases;
 use Moose::Util::TypeConstraints;
 use pdb::solv;
+use Carp;
 
 extends 'DataSet::Creator';
 
@@ -363,16 +364,29 @@ sub _getArgFromPDBAndComplexChainAref {
 sub getInterfaceResidues {
     my $self = shift;
 
-    my $r2A  = $self->complexResID2RelASAHref();
-    
     my @interfaceResidues = ();
     
-    foreach my $chain (@{$self->targetChains}) {
-        push(@interfaceResidues, $chain->getInterfaceResidues($r2A));
+    if ($self->model->hasInterfaceResIDs) {
+        foreach my $chain (@{$self->targetChains}) {
+            croak "Target chain " . $chain->pdbID . " has no interface residues"
+                . " as specified by the user."
+                if ! exists $self->model->interfaceResIDs->{$chain->pdbID};
+
+            push(@interfaceResidues,
+                 @{$self->model->interfaceResIDs->{$chain->pdbID}});
+        }
+    }
+    else {
+        my $r2A  = $self->complexResID2RelASAHref();
+        my @interfaceResidues = ();
+        foreach my $chain (@{$self->targetChains}) {
+            push(@interfaceResidues, $chain->getInterfaceResidues($r2A));
+        }
     }
     return \@interfaceResidues;
 }
 
+    
 sub buildComplexResID2RelASAHref {
     my $self = shift;
 
