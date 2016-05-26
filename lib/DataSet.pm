@@ -158,6 +158,7 @@ sub _buildExpectedTypeForAttribute {
              planarity => 'numeric',
              SSbonds => 'numeric',
              Hbonds => 'numeric',
+             rASA => 'numeric',
              fosta_scorecons => 'numeric',
              blast_scorecons => 'numeric',
              intf_class => '{I,S}' };

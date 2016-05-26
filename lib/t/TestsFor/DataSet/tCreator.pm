@@ -147,6 +147,15 @@ sub noBLASTConstructorArgs {
                                                    pSummaries => $pSummaries));
 }
 
+sub rASAConstructorArgs {
+    my $test = shift;
+    my $chain      = chain->new(pdb_file => 'pdb1a14.ent', chain_id => 'N');
+    my $pSummaries = {'1a14N' => ["<patch N.100> N:92 N:98 N:99 N:100 N:101 N:102 N:103 N:125 N:126 N:127 N:128 N:129 N:130 N:162 N:163 N:164 N:165 N:417 N:418 N:419 N:420 N:448 N:449 N:453 N:458"]};
+    return (chain => $chain,
+            model => DataSet::Instance::Model->new(rASA => 1,
+                                                   pSummaries => $pSummaries));
+}
+
 sub test_missingValues {
     my $test   = shift;
     my $chProc = $test->class->new($test->noFOSTAConstructorArgs());
@@ -201,6 +210,14 @@ sub test_features {
 
     my $expPro = 0.0615;
     ok($inst->pro() - $expPro < 0.0001, "propensity feature added ok");
+}
+
+sub test_rASA {
+    my $test = shift;
+    my $chProc = $test->class->new($test->rASAConstructorArgs());
+    my $inst = $chProc->nextInstance();
+    my $exp = 24.14;
+    is(sprintf("%.2f", $inst->rASA), $exp, "rASA feature added ok");
 }
 
 package TestsFor::DataSet::Creator::Complex;

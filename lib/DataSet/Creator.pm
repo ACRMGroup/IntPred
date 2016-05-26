@@ -617,6 +617,20 @@ sub addFeatures {
                      : $self->calcAvgScoreFromResIDs($inst,
                                                      $self->resID2BLASTScore))
         if $self->model->has_blast;
+    
+    # Calculate patch rASA
+    $inst->rASA($self->getPatchrASA($inst))
+        if $self->model->has_rASA();
+}
+
+sub getPatchrASA {
+    my $self = shift;
+    my $inst = shift;
+    $self->chain->read_ASA() if ! $self->chain->has_read_ASA();
+    my $id2ASA = $self->chain->resid2RelASAHref();
+    my $total = 0;
+    map {$total += $id2ASA->{$_}->{allAtoms}} @{$inst->resIDs};
+    return $total / scalar @{$inst->resIDs};
 }
 
 sub getPatchPropensity {

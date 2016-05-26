@@ -22,7 +22,7 @@ has 'summary' => (
 );
 
 sub _numFeatures {
-    return qw(pro pho pln SS Hb blast fosta predScore);
+    return qw(pro pho pln SS Hb blast fosta predScore rASA);
 }
 
 sub _strFeatures {
@@ -159,6 +159,7 @@ sub _buildFeature2Attribute {
             pho       => 'hydrophobicity',
             pln       => 'planarity',
             secStruct => 'secondary_str',
+            rASA      => 'rASA',
             SS        => 'SSbonds',
             Hb        => 'Hbonds',
             fosta     => 'fosta_scorecons',
@@ -175,6 +176,7 @@ sub _buildFlag2Feature {
             b => 'blast',
             f => 'fosta',
             t => 'secStruct',
+            r => 'rASA',
             c => 'class',
             i => 'id'};
 }
