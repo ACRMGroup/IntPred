@@ -621,10 +621,8 @@ sub addFeatures {
     $inst->secStruct($self->getPatchSecStructStr($inst))
         if $self->model->has_secStruct;
 
-    # Calculate FOSTA scores. Set to missing value '?' if FOSTA failed.
-    $inst->fosta($self->hasFOSTAErr ? '?'
-                     : $self->calcAvgScoreFromResIDs($inst,
-                                                     $self->resID2FOSTAScore))
+    # Calculate FOSTA scores. 
+    $inst->fosta($self->getFOSTAScore($inst))
         if $self->model->has_fosta;
     
     # Calculate BLAST scores. Set to missing value '?' if BLAST failed.
@@ -636,6 +634,23 @@ sub addFeatures {
     # Calculate patch rASA
     $inst->rASA($self->getPatchrASA($inst))
         if $self->model->has_rASA();
+}
+
+sub getFOSTAScore {
+    my $self = shift;
+    my $inst = shift;
+    if ($self->hasFOSTAErr) {
+        # Set to missing value '?' if FOSTA failed.
+        return '?'
+    }
+    else {
+        # Sometimes not all of a chain seq is aligned with a pdbsws entry and
+        # therefore not all residues have a FOSTA score. For patches including
+        # those residues, return missing value
+        my $fostaScore
+            = eval {$self->calcAvgScoreFromResIDs($inst, $self->resID2FOSTAScore)};
+        return defined $fostaScore ? $fostaScore : '?';
+    }
 }
 
 sub getPatchrASA {
