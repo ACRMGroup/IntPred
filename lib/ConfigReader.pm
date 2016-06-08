@@ -203,7 +203,7 @@ sub readInterfaceResIDsFile {
         chomp $line;
         # example line = 2wap:A:102
         my ($pdbCode, $chainID, $resSeq) = split(/:/, $line);
-        push(@{$pdb2InterfaceResIDAref{"$pdbCode$chainID"}}, "chainID.$resSeq");
+        push(@{$pdb2InterfaceResIDAref{"$pdbCode$chainID"}}, "$chainID.$resSeq");
     }
     return \%pdb2InterfaceResIDAref;    
 }
