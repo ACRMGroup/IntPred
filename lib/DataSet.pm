@@ -183,7 +183,7 @@ sub _buildArff {
         = map {$self->_dataSetInstance2ARFFInstance($_, @attributeDescriptions)}
             @{$self->instancesAref()};
 
-    _mapUnlabelledValues(@arffInstances);
+    $self->_mapUnlabelledValues(@arffInstances);
     return ARFF->new(attributeDescriptions => \@attributeDescriptions,
                      instances             => \@arffInstances);
 }
