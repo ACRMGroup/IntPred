@@ -57,7 +57,8 @@ sub calcAvgScoreFromResIDs {
     my $resID2ScoreHref = shift;
     
     my $total = 0;
-    map {$total += $resID2ScoreHref->{$_}} @{$inst->resIDs};
+    map {confess "$self: $_ is not in resID2ScoreHref" if ! exists $resID2ScoreHref->{$_};
+         $total += $resID2ScoreHref->{$_}} @{$inst->resIDs};
     return $total / scalar @{$inst->resIDs};
 }
 
