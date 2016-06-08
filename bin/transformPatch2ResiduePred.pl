@@ -17,15 +17,18 @@ use WEKAOutputParser;
 my $minimal;
 my $vote;
 my $scoreAverage;
+my $fromCentRes;
 my $scoreThresh;
 my $includeNonPatchResidues = 0;
 my $excludeNonLabelledResidues = 1;
 my $predScoresAlreadyTransformed = 0;
 my $continueOnMapFailure = 0;
 
+
 GetOptions("m"   => \$minimal,
            "v"   => \$vote,
            "s"   => \$scoreAverage,
+           "c"   => \$fromCentRes,
            "t=f" => \$scoreThresh,
            "n"   => \$includeNonPatchResidues,
            "a"   => \$predScoresAlreadyTransformed,
@@ -38,9 +41,11 @@ croak "Score threshold must be between 0 and 1"
     if $scoreThresh < 0 || $scoreThresh > 1;
 
 my $option
-    = $minimal ? 0 :
-    $vote ? 1 :
-    $scoreAverage ? 2 : 2; # Default = 2
+    = $minimal      ? 0
+    : $vote         ? 1
+    : $scoreAverage ? 2
+    : $fromCentRes  ? 3
+    : 2; # Default = 2
 
 @ARGV or Usage();
 
@@ -173,7 +178,7 @@ sub resID2PredAndValue {
 
     foreach my $patchID (keys %{$patchID2PredMap}) {
         
-        my ($pdbCode, $chainID) = split(":", $patchID);
+        my ($pdbCode, $chainID, $centResSeq) = split(":", $patchID);
         
         my @resSeqs = eval { @{$patchID2ResSeqMap->{$patchID}} };
         if (! @resSeqs) {
@@ -184,15 +189,19 @@ sub resID2PredAndValue {
         foreach my $resSeq (@resSeqs) {
             my $resID = join(":", lc($pdbCode), $chainID, $resSeq);
 
+            my $prediction
+                = $option != 3 || $resSeq eq $centResSeq ? $patchID2PredMap->{$patchID}->{prediction}
+                : "2:S";
+            
             if (! exists $resID2PredAndValue{$resID}) {
                 $resID2PredAndValue{$resID}
                     = {value => $patchID2PredMap->{$patchID}->{value},
-                       prediction => [$patchID2PredMap->{$patchID}->{prediction}],
+                       prediction => [$prediction],
                        score => [$patchID2PredMap->{$patchID}->{score}]};
             }
             else {
                 push(@{$resID2PredAndValue{$resID}->{prediction}},
-                         $patchID2PredMap->{$patchID}->{prediction});
+                     $prediction);
                 
                 push(@{$resID2PredAndValue{$resID}->{score}},
                      $patchID2PredMap->{$patchID}->{score});
@@ -211,7 +220,7 @@ sub decidePredictionLabel {
     my $resID2PredAndValueHref = shift;
     my $option = shift;
     my $scoreThresh = shift;
-
+    
     $scoreThresh = 0.5 if ! $scoreThresh;
     
     foreach my $resID (keys %{$resID2PredAndValueHref}) {
@@ -219,7 +228,7 @@ sub decidePredictionLabel {
         map {++$label2Freq{$_}}
             @{$resID2PredAndValueHref->{$resID}->{prediction}};
         
-        if ($option == 0) {
+        if ($option == 0 || $option == 3) {
             $resID2PredAndValueHref->{$resID}->{prediction}
                 = exists $label2Freq{"1:I"} ? "1:I" : "2:S";
         }
@@ -233,6 +242,13 @@ sub decidePredictionLabel {
             $resID2PredAndValueHref->{$resID}->{prediction}
                 = $resID2PredAndValueHref->{$resID}->{score} >= $scoreThresh ?
                     "1:I" : "2:S";
+        }
+        elsif ($option == 3) {
+            # option fromCentralRes will single predictions for each residue
+            # that is a patch centre, and an array of "2:S" predictions for
+            # any other residue
+            $resID2PredAndValueHref->{$resID}->{prediction}
+                = $resID2PredAndValueHref->{$resID}->{prediction}->[0];
         }
     }
 }
@@ -308,6 +324,8 @@ OPTS:
   -s : Score.   The prediction scores for all the patches a residue occurs in
                 are averaged. If the average score is > threshold, residue is
                 labelled interface.
+  -c : Centre.  The central residue of each patch is labelled according to its
+                patch prediction label. All other patches are labelled as 2:S.
 
   -t : Score treshold. Used for -s score option. DEFAULT = 0.5
 
