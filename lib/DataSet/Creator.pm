@@ -776,8 +776,10 @@ sub addFeatures {
 sub getPatchID {
     my $patch = shift;
 
-    return join(":", ($patch->pdb_code, $patch->central_atom->chainID,
-                      $patch->central_atom->resSeq));
+    my $id = join(":", ($patch->pdb_code, $patch->central_atom->chainID,
+                        $patch->central_atom->resSeq));
+    return $patch->central_atom->has_iCode ? $id . $patch->central_atom->iCode()
+        : $id;
 }
 
 sub getNumSSBonds {
