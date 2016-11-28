@@ -4,10 +4,12 @@ use warnings;
 use Getopt::Long;
 
 my $noStats = 0;
+my $byPDB = 0;
 
-GetOptions("n", \$noStats);
+GetOptions("n", \$noStats,
+           "p", \$byPDB);
 
-@ARGV or die "Please supply some run prediction csvs\n";
+@ARGV or Usage();
 
 my %lineMap = ();
 
@@ -33,10 +35,11 @@ foreach my $file (@ARGV) {
         
         next if $line eq $header;
         my $pID = [split(/,/, $line)]->[5];
+        my ($pdb)  = $pID =~ /(.*?):/;
         my ($chID) = $pID =~ /(.*):/;
         $chID =~ s/://;
 
-        push(@{$lineMap{$chID}->{$runID}}, $line);
+        push(@{$lineMap{$byPDB ? $pdb : $chID}->{$runID}}, $line);
     }
 }
 
@@ -55,4 +58,16 @@ foreach my $chID (keys %lineMap) {
 
 print `calcStatsFromWEKAOutputCSV.pl -c -U ? S I @outFiles` unless $noStats;
 
- 
+sub Usage {
+    print <<EOF;
+$0 -p -n prediction-csvs
+
+Opts:
+    -p group predictions by pdb, rather than chain.
+    -n do not output stats.
+
+This script will split prediction csvs into their component
+chains (or pdbs). Summary stats will also be output if desired.
+EOF
+    exit(1);
+}
