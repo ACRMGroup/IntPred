@@ -54,10 +54,16 @@ sub getPredictor {
 
 sub createDataSetCreator {
     my $self = shift;
+
+    my $maxProc
+        = $self->exists(qw(DataSetCreation maxProc)) ? $self->val(qw(DataSetCreation maxProc))
+        : 1;
+    
     my $creator
         = DataSet::Creator::Master->new(
             model   => $self->createInstanceModel(),
             inputs  => [$self->createInputs()],
+            maxProc => $maxProc,
         );
     return $creator;
 }
