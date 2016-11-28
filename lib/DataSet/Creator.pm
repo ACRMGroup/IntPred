@@ -62,6 +62,19 @@ sub calcAvgScoreFromResIDs {
     return $total / scalar @{$inst->resIDs};
 }
 
+sub calcAvgScoreFromPDBResIDs {
+    my $self = shift;
+    my $inst = shift;
+    my $pdbResID2ScoreHref = shift;
+    
+    my $total = 0;
+    map {confess "$self: $_ is not in pdbResID2ScoreHref" if ! exists $pdbResID2ScoreHref->{$_};
+         $total += $pdbResID2ScoreHref->{$_}}
+        map {my $resID = $_; $resID =~ s/\./:/;
+             join(":", $inst->getPDBCode(), $resID)} @{$inst->resIDs};
+    return $total / scalar @{$inst->resIDs};
+}
+
 sub nextInstance {
     my $self = shift;
     
@@ -509,6 +522,12 @@ has 'patches' => (
     builder => 'buildPatches'
 );
 
+has 'consScoresDir', => (
+    is => 'rw',
+    predicate => 'has_consScoresDir',
+);
+
+
 around 'BUILDARGS' => sub {
     my $orig  = shift;
     my $class = shift;
@@ -583,9 +602,12 @@ sub buildResID2FOSTAScore {
     my $self = shift;
 
     my %rSeq2FScore
-        = eval {DataSet::CalcConservationScores::FOSTA($self->chain,
-                                                       $self->model->FOSTAHitMin)};
-    
+        = eval {DataSet::CalcConservationScores::getFOSTAScoresForChain(
+            $self->chain,
+            $self->model->has_consScoresDir ? $self->model->consScoresDir : "",
+            $self->model->FOSTAHitMin)};
+
+    print $@;
     $self->FOSTAErr($@) && return {} if ! %rSeq2FScore;
     
     # Return ref to hash where keys are ResIDs (ChainID.resSeq)
@@ -597,10 +619,12 @@ sub buildResID2BLASTScore {
     my $self = shift;
     
     my %rSeq2BScore
-        = eval {DataSet::CalcConservationScores::BLAST($self->chain,
-                                                       0.01, # e-value
-                                                       $self->model->BLASTHitMin,
-                                                       $self->model->BLASTHitMax)};
+        = eval {DataSet::CalcConservationScores::getBLASTScoresForChain(
+            $self->chain,
+            $self->model->has_consScoresDir ? $self->model->consScoresDir : "",
+            0.01, # e-value
+            $self->model->BLASTHitMin,
+            $self->model->BLASTHitMax)};
 
     $self->BLASTErr($@) && return {} if ! %rSeq2BScore;
     
@@ -614,16 +638,13 @@ sub addFeatures {
     my $inst  = shift;
    
     # Calculate patch propensity
-    $inst->pro($self->getPatchPropensity($inst))
-        if $self->model->has_pro;
+    $inst->pro($self->getPatchPropensity($inst)) if $self->model->has_pro;
     
     # Calculate Secondary Structure
-    $inst->secStruct($self->getPatchSecStructStr($inst))
-        if $self->model->has_secStruct;
+    $inst->secStruct($self->getPatchSecStructStr($inst)) if $self->model->has_secStruct;
 
     # Calculate FOSTA scores. 
-    $inst->fosta($self->getFOSTAScore($inst))
-        if $self->model->has_fosta;
+    $inst->fosta($self->getFOSTAScore($inst)) if $self->model->has_fosta;
     
     # Calculate BLAST scores. Set to missing value '?' if BLAST failed.
     $inst->blast($self->hasBLASTErr ? '?'
