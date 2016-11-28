@@ -3,6 +3,7 @@ use Moose::Util::TypeConstraints;
 use Config::IniFiles;
 use Carp;
 use TCNUtil::types;
+use Data::Dumper;
 
 subtype 'IntPred::ArrayRefOfStrings',
     as 'ArrayRef[Str]';
@@ -33,7 +34,10 @@ class_type 'Config::IniFiles';
 coerce 'Config::IniFiles',
     from 'FileReadable',
     via {croak "File $_ is empty! Config file must not be empty" if -z $_;
-         Config::IniFiles->new(-file => $_)};
+         my $cnf = Config::IniFiles->new(-file => $_);
+         croak "Configuration file has an error: " . Dumper \@Config::IniFiles::errors
+             if ! defined $cnf;
+         return $cnf};
 
 sub _getPatchCentreHashFromDir {
     my $dir = shift;
