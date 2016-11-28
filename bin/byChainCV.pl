@@ -15,6 +15,8 @@ use List::Compare;
 my $balance     = 0;
 my $numFolds    = 0;
 my $labelDist   = 0.5;
+my $numTrees    = 100;
+my $numFeatures = 3;
 
 unless ($labelDist < 1) {
     print "Label distribution must be < 1!\n";
@@ -23,7 +25,9 @@ unless ($labelDist < 1) {
 
 GetOptions("b",   \$balance,
            "d=s", \$labelDist,
-           "k=i", \$numFolds);
+           "k=i", \$numFolds,
+           "n=i", \$numTrees,
+           "f=i", \$numFeatures);
 
 # Get cmd-line args
 @ARGV or Usage();
@@ -101,6 +105,8 @@ foreach my $trainAndTestAref (@trainAndTestArefs) {
 
 my %arg = (partitionAref => \@partitionArgArefs,
            removeAttribute => 1,
+           numTrees => $numTrees,
+           numFeatures => $numFeatures,
            posLabel => 'I',
            negLabel => 'S',
            undefLabel => '?');
@@ -423,14 +429,17 @@ sub prepareOutDir {
 
 sub Usage {
     print <<EOF;
-$0 -b -k INT outputDir inputArff sshMachine
+$0 -b -d NUM -k INT outputDir inputArff sshMachine
 
 If no sshMachine is supplied, then WEKA is run locally.
 
  -b : Balance training sets.
+ -d : Specify what fraction of training sets should be the negative set after
+      balancing. DEFAULT = 0.5.
  -k : k-fold CV. If specified, this will split training and test sets into k
       sets for CV, rather than doing leave-one-out byChain CV.
-}
+ -n : number of trees used in random forests. DEFAULT = 100
+ -f : number of features. DEFAULT = 3
 
 byChainCV.pl allows you to perform by-chain cross validation on a data set of
 patches. By-chain cross validation ensures that patches from a given chain do
