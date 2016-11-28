@@ -207,13 +207,13 @@ has 'labelThreshold' => (
 has 'FOSTAHitMin' => (
     isa => 'Int',
     is  => 'rw',
-    default => 10,
+    default => 5,
 );
 
 has 'BLASTHitMin' => (
     isa => 'Int',
     is  => 'rw',
-    default => 10,
+    default => 5,
 );
 
 has 'BLASTHitMax' => (
@@ -251,6 +251,16 @@ has 'interfaceResIDs' => (
     is => 'rw',
     isa => 'HashRef',
     predicate => 'hasInterfaceResIDs'
+);
+
+has 'pdbResID2TolLabel' => (
+    is => 'rw',
+    isa => 'HashRef',
+);
+
+has 'consScoresDir' => (
+    is => 'rw',
+    predicate => 'has_consScoresDir',
 );
 
 has 'featureStr' => (
