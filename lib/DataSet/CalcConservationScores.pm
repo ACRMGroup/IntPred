@@ -13,12 +13,65 @@ use TCNUtil::FOSTA;
 
 use TCNUtil::sequence;
 
-sub BLAST {
-    my $chain  = shift;
-    my $eval   = shift;
-    my $hitMin = shift;
-    my $hitMax = shift;
+sub getBLASTScoresForChain {
+    my ($chain, $storedScoresDir, $eval, $hitMin, $hitMax) = @_;
+    return getConsScores("BLAST", @_);
+}
 
+sub getFOSTAScoresForChain {
+    my ($chain, $storedScoresDir, $hitMin) = @_;
+    return getConsScores("FOSTA", @_);
+}
+
+sub getConsScores {
+    my $scoreType = shift;
+    my $chain = shift;
+    my $storedScoresDir = shift;
+    my %rSeq2consScores;
+
+    my $previousAttempt = 0;
+    
+    if ($storedScoresDir) {
+        my $success = eval {%rSeq2consScores = getStoredConsScores($storedScoresDir, $chain, $scoreType);
+                        1};
+        if (! $success) {
+            if ($@ =~ /No attempt/) {
+                # No attempt made previously, so we'll try below
+            }
+            else {
+                croak "Something went wrong trying to get saved $scoreType scores: $@";
+            }
+        }
+        else {
+            $previousAttempt = 1;
+        }
+    }
+
+    # Check for no previous attempt because hash will be empty
+    # if there has been a previous attempt that didn't work
+    # (and we don't want to repeat the failed process!)
+    if (! %rSeq2consScores && ! $previousAttempt) {
+        my $success = eval {
+            if ($scoreType eq "BLAST") {
+                %rSeq2consScores = BLAST($chain, @_);
+            }
+            else {
+                %rSeq2consScores = FOSTA($chain, @_);
+            }
+            1;
+        };
+        _saveConsScores($storedScoresDir, $chain, $scoreType, \%rSeq2consScores)
+            if $storedScoresDir;
+        if (! $success) {
+            croak $@;
+        }
+    }
+    return %rSeq2consScores;
+}
+
+sub BLAST {
+    my ($chain, $eval, $hitMin, $hitMax) = @_;
+    
     # Get homologue sequences
     # Opts match Anja's originals
     my %arg = (evalue => $eval, opts => {-b => 2000, -v => 2000,
@@ -58,13 +111,12 @@ sub BLAST {
     my $MSA   = MSA::Muscle::Factory->new(remote => 0)->getMuscle(@muscleArg);
     my $sCons = scorecons->new(targetSeqIndex => 0);
     $MSA->consScoreCalculator($sCons);
-   
-    my @scorecons = $MSA->calculateConsScores();
-    
+    my @consScores = $MSA->calculateConsScores();
+
+    # Map from resSeq to consScores
     my %chainSeq2resSeq = $chain->map_chainSeq2resSeq();
-    # Map from resSeq to scorecons
-    return map {$chainSeq2resSeq{$_ + 1} => $scorecons[$_]}
-        (0 .. @scorecons - 1);
+    return map {$chainSeq2resSeq{$_ + 1} => $consScores[$_]}
+        (0 .. @consScores - 1);
 }
 
 sub FOSTA {
@@ -75,15 +127,17 @@ sub FOSTA {
     my $pdbsws  = pdb::pdbsws::Factory->new(remote => 1)->getpdbsws;
     
     print "Getting ac for query chain ...\n";
-    # get SwissProt AC for chain
-    my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($chain->pdb_code,
+    # Avoid sending pqs codes (e.g. 1afs_1 and instead send the base PDB code)
+    my ($pdbCode) = $chain->pdb_code =~ /_/ ? $chain->pdb_code =~ /(.*)_/
+        : $chain->pdb_code;
+    my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
                                                          $chain->chain_id);
     croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
     my $sprot_ac = $sprot_ac[0];
     my $FASTAStr = UNIPROT::GetFASTA($sprot_ac, -remote => 1);
     my $sprot_id = UNIPROT::parseIDFromFASTAStr($FASTAStr);
     
-    print "Getting query SwissProt sequence...\n";
+    print "Getting sequence for query, id=$sprot_id ...\n";
     my $spSeq    = sequence->new($FASTAStr);
     
     print "Getting FEP sequences ...\n";
@@ -100,12 +154,12 @@ sub FOSTA {
     print "Calculating conservation scores for query residues\n";
     $MSA->consScoreCalculator(scorecons->new(targetSeqIndex => 0));
     my @consScores = $MSA->calculateConsScores();
-
-    return mapResSeq2conScore($chain, $sprot_ac, \@consScores, $pdbsws); 
+    return mapResSeq2conScore($pdbCode, $chain->chain_id(), $sprot_ac, \@consScores, $pdbsws); 
 }
 
 sub mapResSeq2conScore {
-    my $chain          = shift;
+    my $pdbCode = shift;
+    my $chainID = shift;
     my $sprot_ac       = shift;
     my $consScoresAref = shift;
     my $pdbsws         = shift;
@@ -113,9 +167,9 @@ sub mapResSeq2conScore {
     print "Mapping chain resSeqs to SwissProt numbering ...\n";
     # Get ChainResSeq -> SwissProtNum map
     my %resSeq2SprotNum
-        = $pdbsws->mapResSeq2SwissProtNum($chain->pdb_code,
-                                         $chain->chain_id,
-                                         $sprot_ac);
+        = $pdbsws->mapResSeq2SwissProtNum($pdbCode,
+                                          $chainID,
+                                          $sprot_ac);
     
     print "Mapping SwissProt numbering to conservation scores ...\n";
     # Get SwissProtNum -> conservation scores map
@@ -163,6 +217,36 @@ sub mapResSeq2SprotResNum {
         }
     }
     return %resSeq2SprotResNum;
+}
+
+sub getStoredConsScores {
+    my ($dir, $chain, $scoreType) = @_;
+    croak "scoreType must be 'FOSTA' or 'BLAST'"
+        if ! ($scoreType eq 'BLAST' || $scoreType eq 'FOSTA');
+    my $chainID = $chain->pdbID();
+    my $scoreFile = "$dir/$scoreType/$chainID";
+    if (-e $scoreFile) {
+        return _readConsScoresFromFile($scoreFile);
+    }
+    else {
+        croak "No attempt to calculate $scoreType scores previously";
+    }
+}
+
+sub _readConsScoresFromFile {
+    my ($scoreFile) = @_;
+    open(my $IN, "<", $scoreFile) or die "Cannot open file $scoreFile, $!";
+    my %rSeq2consScores = map {chomp $_; split(",", $_);} <$IN>;
+    return %rSeq2consScores;
+}
+
+sub _saveConsScores {
+    my($storedScoresDir, $chain, $scoreType, $scoresHref) = @_;
+    my $outFile = "$storedScoresDir/$scoreType/" . $chain->pdbID();
+    open(my $OUT, ">", $outFile) or die "Cannot open file $outFile, $!";
+    while (my ($rSeq, $consScore) = each %{$scoresHref}) {
+        print {$OUT} "$rSeq,$consScore\n";
+    }
 }
 
 1;

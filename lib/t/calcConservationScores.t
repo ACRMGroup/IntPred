@@ -26,13 +26,19 @@ BEGIN { use_ok( 'DataSet::CalcConservationScores' ); }
 
 my $eval   = 1;
 my $hitMin = 5;
-my $hitMax = 100;
+my $hitMax = 10;
 
-lives_ok {DataSet::CalcConservationScores::BLAST(getTestChain(), $eval, $hitMin, $hitMax)}
+lives_ok {DataSet::CalcConservationScores::getBLASTScoresForChain(getTestChain(), "", $eval, $hitMin, $hitMax)}
     "BLAST";
 
-lives_ok {DataSet::CalcConservationScores::FOSTA(getTestChain(), $hitMin)}
+lives_ok {DataSet::CalcConservationScores::getFOSTAScoresForChain(getTestChain(), "", $hitMin)}
     "FOSTA";
+
+lives_ok {DataSet::CalcConservationScores::getBLASTScoresForChain(getTestChain(), "testConsScores", $eval, $hitMin, $hitMax)}
+    "BLAST from saved consScores";
+
+lives_ok {DataSet::CalcConservationScores::getFOSTAScoresForChain(getTestChain(), "testConsScores", $hitMin)}
+    "FOSTA from saved consScores";
 
 sub getTestChain {
     return chain->new(pdb_code => '1bzq', chain_id => 'A',
