@@ -186,7 +186,7 @@ sub test_resID2conScoreBuilds {
     $chProc->resID2FOSTAScore();
     ok(! $chProc->FOSTAErr(), "resID2FOSTAScore build ok")
         or diag explain $chProc->FOSTAErr();
-
+    
     $chProc->model->BLASTHitMax(10); # Make hitMax small to speed up testing
     $chProc->resID2BLASTScore();
     ok(! $chProc->BLASTErr(), "resID2BLASTScore build ok")

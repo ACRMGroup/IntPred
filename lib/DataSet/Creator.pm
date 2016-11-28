@@ -593,7 +593,8 @@ sub _filterOutNoCAResSeqs {
     my $self = shift;
     my $resSeqAndAtomNameArefs = shift;
     return grep {$self->chain->doesResSeqHaveCA($_->[0])} @{$resSeqAndAtomNameArefs};
-}    
+}
+
 sub buildChildClass {
     return "DataSet::Creator::Patch";
 }
@@ -653,8 +654,17 @@ sub addFeatures {
         if $self->model->has_blast;
     
     # Calculate patch rASA
-    $inst->rASA($self->getPatchrASA($inst))
-        if $self->model->has_rASA();
+    $inst->rASA($self->getPatchrASA($inst)) if $self->model->has_rASA();
+
+    # Calculate patch tolerance score
+    $inst->tol($self->getTolerance($inst)) if $self->model->has_tol;
+}
+
+sub getTolerance {
+    my $self = shift;
+    my $inst = shift;
+    my $tol = eval {$self->calcAvgScoreFromPDBResIDs($inst, $self->model->pdbResID2TolLabel)};
+    return defined $tol ? $tol : '?'; 
 }
 
 sub getFOSTAScore {

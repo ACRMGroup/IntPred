@@ -90,6 +90,12 @@ sub createInstanceModel {
 
     $model->interfaceResIDs($self->readInterfaceResIDsFile)
         if $self->exists(qw(DataSetCreation interfaceResIDsFile));
+
+    $model->pdbResID2TolLabel($self->readToleranceLabelFile)
+        if $self->exists(qw(DataSetCreation toleranceLabelsFile));
+
+    $model->consScoresDir($self->_getPathForVal(qw(DataSetCreation consScoresDir)))
+        if $self->exists(qw(DataSetCreation consScoresDir));
     
     return $model;
 }
@@ -230,6 +236,14 @@ sub readPatchDir {
             = [map {chomp $_; $_} <$IN>]; # Remove new-lines
     }
     return \%pdbID2pSummaries;
+}
+
+sub readToleranceLabelFile {
+    my $self = shift;
+    my $tolLabFile = $self->_getPathForVal(qw(DataSetCreation toleranceLabelsFile));
+    open(my $IN, "<", $tolLabFile) or die "Cannot open file $tolLabFile, $!";
+    my %pdb2ResID2Label = map {chomp $_; $_ =~ /(.*):(.*)/; $1 => $2} <$IN>;
+    return \%pdb2ResID2Label;
 }
 
 1;

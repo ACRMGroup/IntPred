@@ -2,7 +2,6 @@ package DataSet::Instance;
 use Moose;
 use Moose::Util::TypeConstraints;
 use overload '""' => 'stringify';
-
 ### Attributes #################################################################
 ################################################################################
 
@@ -22,7 +21,7 @@ has 'summary' => (
 );
 
 sub _numFeatures {
-    return qw(pro pho pln SS Hb blast fosta predScore rASA);
+    return qw(pro pho pln SS Hb blast fosta predScore rASA tol);
 }
 
 sub _strFeatures {
@@ -94,12 +93,12 @@ sub getLabel {
 
 sub getPDBCode {
     my $self = shift;
-    return [split(":", $_->id)]->[0];
+    return [split(":", $self->id)]->[0];
 }
 
 sub getChainID {
     my $self = shift;
-    return [split(":", $_->id)]->[1];
+    return [split(":", $self->id)]->[1];
 }
 
 sub getPDBID {
@@ -160,6 +159,7 @@ sub _buildFeature2Attribute {
             pln       => 'planarity',
             secStruct => 'secondary_str',
             rASA      => 'rASA',
+            tol       => 'tol',
             SS        => 'SSbonds',
             Hb        => 'Hbonds',
             fosta     => 'fosta_scorecons',
@@ -177,6 +177,7 @@ sub _buildFlag2Feature {
             f => 'fosta',
             t => 'secStruct',
             r => 'rASA',
+            a => 'tol',
             c => 'class',
             i => 'id'};
 }
