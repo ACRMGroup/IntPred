@@ -608,9 +608,17 @@ sub buildResID2FOSTAScore {
             $self->model->has_consScoresDir ? $self->model->consScoresDir : "",
             $self->model->FOSTAHitMin)};
 
-    print $@;
-    $self->FOSTAErr($@) && return {} if ! %rSeq2FScore;
-    
+    if(! %rSeq2FScore){
+	print "No FOSTA scores obtained for " . $self->chain->pdbID();
+	if($@ =~ /Error code -1/){
+	    print ": chain is not assigned to a FOSTA family\n";
+	}
+	else{
+	    print $@;
+	}
+	$self->FOSTAErr($@);
+	return {};
+    }
     # Return ref to hash where keys are ResIDs (ChainID.resSeq)
     return {map {$self->chain->chain_id . ".$_" => $rSeq2FScore{$_}}
                 keys %rSeq2FScore}
@@ -627,8 +635,13 @@ sub buildResID2BLASTScore {
             $self->model->BLASTHitMin,
             $self->model->BLASTHitMax)};
 
-    $self->BLASTErr($@) && return {} if ! %rSeq2BScore;
-    
+    if(! %rSeq2BScore){
+	print "No BLAST scores obtained for " . $self->chain->pdbID() 
+	    . ": " . $@ . "\n";
+	$self->BLASTErr($@);
+	return {};
+    }
+   
     # Return ref to hash where keys are ResIDs (ChainID.resSeq)
     return {map {$self->chain->chain_id . ".$_" => $rSeq2BScore{$_}}
                 keys %rSeq2BScore};    
