@@ -126,12 +126,13 @@ sub FOSTA {
     my $findFFs = FOSTA::Factory->new(remote => 1)->getFOSTA();
     my $pdbsws  = pdb::pdbsws::Factory->new(remote => 1)->getpdbsws;
     
-    print "Getting ac for query chain ...\n";
     # Avoid sending pqs codes (e.g. 1afs_1 and instead send the base PDB code)
     my ($pdbCode) = $chain->pdb_code =~ /_/ ? $chain->pdb_code =~ /(.*)_/
         : $chain->pdb_code;
+    print "Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
     my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
                                                          $chain->chain_id);
+    print "ac = @sprot_ac\n";
     croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
     my $sprot_ac = $sprot_ac[0];
     my $FASTAStr = UNIPROT::GetFASTA($sprot_ac, -remote => 1);
