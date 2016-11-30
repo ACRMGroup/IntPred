@@ -88,7 +88,7 @@ sub BLAST {
     my $hitCount = 0;
     
     foreach my $hit (@hits) {
-        my $hitSeq = eval {$blaster->reportHandler->swissProtSeqFromHit($hit)};
+	my $hitSeq = $blaster->reportHandler->swissProtSeqFromHit($hit);
         print "Failed to get sequence for hit $hit, $@" && next
             if ! $hitSeq;
         
