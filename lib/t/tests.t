@@ -10,7 +10,8 @@ my $includeRE;
 
 GetOptions("j=i", \$numJobs,
            "i=s", \$includeRE);
-my %arg = (test_classes => \@ARGV, jobs => $numJobs);
+my %arg = (test_classes => \@ARGV);
+$arg{jobs} = $numJobs if defined $numJobs && $numJobs > 1;
 $arg{include} = qr/$includeRE/ if defined $includeRE;
 
 Test::Class::Moose::Runner->new(%arg)->runtests();
