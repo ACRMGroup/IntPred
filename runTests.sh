@@ -1,1 +1,2 @@
-prove -v --exec '/usr/bin/env perl -Ilib' tests.t :: -j 4
+cd lib/t
+prove --exec '/usr/bin/env perl -I../lib' tests.t
