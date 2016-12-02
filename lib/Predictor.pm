@@ -8,6 +8,7 @@ use Carp;
 has 'trainingSet' => (
     is => 'rw',
     isa => 'DataSet',
+    predicate => 'has_trainingSet',
 );
 
 has 'testSet' => (
@@ -31,7 +32,12 @@ has 'outputParser' => (
 
 sub trainPredictor {
     my $self = shift;
-    croak "Not yet implemented!\n";
+    croak "No training set assigned!" if ! $self->has_trainingSet;
+    
+    $self->randomForest->trainArff($self->trainingSet->arff);
+    $self->randomForest->removeAttribute('1'); # Should always be patchID
+    $self->trainingSet->makeArffCompatible();
+    $self->randomForest->train();
 }
 
 sub runPredictor {

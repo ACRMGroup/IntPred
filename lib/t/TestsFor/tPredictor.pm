@@ -37,12 +37,32 @@ sub test_getPredictionScoresForTestSet {
                "And predScores match expected");
 }
 
+sub test_trainPredictor {
+    my $test       = shift;
+    my $tPredictor = $test->class->new(constructorArgs());
+    _remove_test_trainPredictor_modelFile();
+    $tPredictor->randomForest(WEKA::randomForest->new(model => _get_test_trainPredictor_modelFile()));
+    ok($tPredictor->trainPredictor(), "trainPredictor runs ok");
+    ok($tPredictor->runPredictor(), 
+       "runPredictor can be run on trained predictor");
+    _remove_test_trainPredictor_modelFile();
+}
+
+sub _remove_test_trainPredictor_modelFile {
+    my $modelFile = _get_test_trainPredictor_modelFile();
+    unlink($modelFile) if -e $modelFile;
+}
+
+sub _get_test_trainPredictor_modelFile {
+    return ("testWEKAModels/test_trainPredictor.model");
+}
+   
 sub _getTestDataSet {
     return DataSet->new(ARFF::FileParser->new(file => "testPredictor.arff")->parse());
 }
 
 sub _getTrainDataSet {
-    return DataSet->new(ARFF::FileParser->new(file => "train2StandAgainst.arff")->parse());
+    return DataSet->new(ARFF::FileParser->new(file => "training_set.arff")->parse());
 }
 
 sub _getRandomForest {
@@ -50,7 +70,7 @@ sub _getRandomForest {
 }
 
 sub _getExpectedPredScores {
-    return [qw(0.369 0.303 0.407 0.345 0.417 0.458 0.447 0.414 0.393 0.41)];
+    return [qw(0.42 0.26 0.47 0.447 0.465 0.48 0.48 0.471 0.48 0.49)];
 }
 
 1;
