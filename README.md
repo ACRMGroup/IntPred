@@ -9,3 +9,5 @@ IntPred is a library for the prediction of protein-protein interface sites from 
 2. Run `getperldeps.pl` to check for perl dependencies and install any that are missing.
 
 3. Run `runTests.sh`.
+
+To run the main IntPred predictor, you need the WEKA model file. Run `getIntPredModel.sh` to grab this and decompress it.
