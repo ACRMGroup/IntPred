@@ -614,7 +614,7 @@ sub buildResID2FOSTAScore {
 	    print ": chain is not assigned to a FOSTA family\n";
 	}
 	else{
-	    print $@;
+	    print ": $@";
 	}
 	$self->FOSTAErr($@);
 	return {};
