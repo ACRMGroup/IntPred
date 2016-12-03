@@ -1,2 +1,5 @@
 anjaLib/*
 bin/createAnjaPredDataSet.pl
+data/consScores/FOSTA/*
+data/consScores/BLAST/*
+data/IntPred/*.model*
