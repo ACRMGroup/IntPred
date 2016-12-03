@@ -10,7 +10,7 @@ has 'class' => (default => 'Predictor', isa => 'Str', is => 'ro', lazy => 1);
 sub constructorArgs {
     my $test = shift;
     return (trainingSet => _getTrainDataSet(), testSet => _getTestDataSet(),
-            randomForest => _getRandomForest());
+            randomForest => _getRandomForest(), trainedOnStandardizedDataSet => 1);
 }
     
 sub test_constructor {

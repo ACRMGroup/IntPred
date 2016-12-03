@@ -49,6 +49,8 @@ sub getPredictor {
     my $self = shift;
     my $pred = Predictor->new();
     $pred->randomForest->model($self->getModelFile());
+    $pred->trainedOnStandardizedDataSet($self->val(qw(Predictor standardized)))
+	if $self->exists(qw(Predictor standardized));
     return $pred;
 }
 

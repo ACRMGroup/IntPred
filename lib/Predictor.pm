@@ -30,10 +30,16 @@ has 'outputParser' => (
     default => sub {WEKAOutputParser->new()},
 );
 
+has 'trainedOnStandardizedDataSet' => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => 0,
+    );
+
 sub trainPredictor {
     my $self = shift;
     croak "No training set assigned!" if ! $self->has_trainingSet;
-    
     $self->randomForest->trainArff($self->trainingSet->arff);
     $self->randomForest->removeAttribute('1'); # Should always be patchID
     $self->trainingSet->makeArffCompatible();
@@ -63,10 +69,12 @@ sub _prepareForTesting {
 
 sub _prepareDataSets {
     my $self = shift;
-    $self->trainingSet->makeArffCompatible();
+    $self->trainingSet->makeArffCompatible() if $self->has_trainingSet;
     $self->testSet->makeArffCompatible();
-    print "Standardizing test set ... ";
-    $self->testSet->standardizeArffUsingRefArff($self->trainingSet->arff);
+    if($self->trainedOnStandardizedDataSet){
+	print "Standardizing test set ... ";
+	$self->testSet->standardizeArffUsingRefArff($self->trainingSet->arff);
+    }
     print "done\n";
 }
 
