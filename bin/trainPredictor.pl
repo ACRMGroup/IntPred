@@ -6,8 +6,8 @@ use lib "$FindBin::Bin/../lib";
 use ConfigReader;
 use Getopt::Long;
 use File::Basename;
-use ARFF;
-use WEKA;
+use TCNUtil::ARFF;
+use TCNUtil::WEKA;
 use DataSet;
 use Predictor;
 
@@ -43,4 +43,5 @@ $0 -m outModelFile inputARFF
 This script trains a learner on the input arff file.
 
 EOF
+  exit(1);
 }
