@@ -8,6 +8,8 @@ else
 fi
 
 H=`pwd`
+echo "export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}" >  $H/setup.sh
+echo "export PERL5LIB=$TCNlib/lib:$PERL5LIB"             >> $H/setup.sh
 
 # System preliminaries
 if [ 'x' == 'y' ]; then
