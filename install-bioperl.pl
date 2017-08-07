@@ -1,12 +1,16 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -s
 # Script to install the latest version of BioPerl
 # This pads each element of a version number with zeros TO THE RIGHT.
 # This works at present but may not in future!
 #
+# By default uses the perl in the path, but this can be overridden
+# using:
+#    ./install-bioperl -perl=/path/to/perl
+#
 # 07.08.17 By: ACRM
 #----------------------------------------------------------------------
 use strict;
-
+$::perl = 'perl' if(!defined($::perl));
 my $bplatest = FindLatestBioPerl();
 
 print "\nThe latest version of the main BioPerl package is:\n";
@@ -18,7 +22,7 @@ chomp $yorn;
 $yorn = substr("\L$yorn", 0, 1);
 if(($yorn eq 'y') || ($yorn eq ''))
 {
-   my $bpinfo = `echo "force install $bplatest" | perl -MCPAN -e shell`;
+   my $bpinfo = `echo "force install $bplatest" | $::perl -MCPAN -e shell`;
    print $bpinfo;
 }
 
@@ -27,7 +31,7 @@ if(($yorn eq 'y') || ($yorn eq ''))
 # 07.08.17 Original   By: ACRM
 sub FindLatestBioPerl
 {
-    my $bpinfo = `echo "d /bioperl/" | perl -MCPAN -e shell`;
+    my $bpinfo = `echo "d /bioperl/" | $::perl -MCPAN -e shell`;
     print "\nCPAN revealed the following for BioPerl:\n";
     print "$bpinfo\n";
 
