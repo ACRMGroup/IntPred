@@ -1,32 +1,36 @@
 #!/usr/bin/perl
 # Script to install the latest version of BioPerl
+# This pads each element of a version number with zeros TO THE RIGHT.
+# This works at present but may not in future!
+#
 # 07.08.17 By: ACRM
 #----------------------------------------------------------------------
 use strict;
 
-my $bpinfo = `echo "d /bioperl/" | perl -MCPAN -e shell`;
-print "\nCPAN revealed the following for BioPerl:\n";
-print "$bpinfo\n";
-my $bplatest = FindLatest($bpinfo);
+my $bplatest = FindLatestBioPerl();
+
 print "\nThe latest version of the main BioPerl package is:\n";
 print "$bplatest\n";
+
 print "\nDo you wish to install this version? (y/n)[y]: ";
 my $yorn=<>;
 chomp $yorn;
 $yorn = substr("\L$yorn", 0, 1);
 if(($yorn eq 'y') || ($yorn eq ''))
 {
-   $bpinfo = `echo "force install $bplatest" | perl -MCPAN -e shell`;
+   my $bpinfo = `echo "force install $bplatest" | perl -MCPAN -e shell`;
    print $bpinfo;
 }
 
 #----------------------------------------------------------------------
-# Takes the information from listing packages in CPAN and finds the latest
-# BioPerl
+# Finds the latest BioPerl in CPAN
 # 07.08.17 Original   By: ACRM
-sub FindLatest
+sub FindLatestBioPerl
 {
-    my ($bpinfo) = @_;
+    my $bpinfo = `echo "d /bioperl/" | perl -MCPAN -e shell`;
+    print "\nCPAN revealed the following for BioPerl:\n";
+    print "$bpinfo\n";
+
     my @packages = ();
     my @versions = ();
     my @lines = split(/\n/, $bpinfo);
@@ -58,6 +62,10 @@ sub FindLatest
 }
 
 #----------------------------------------------------------------------
+# Tests whether $thisVers is newer than $bestVers. Each part of a 
+# version number is padded with zeros to the right - this works at
+# present but may not be the right thing to do in future!
+#
 # 07.08.17 Original   By: ACRM
 sub IsNewer
 {
