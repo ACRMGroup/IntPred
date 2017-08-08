@@ -34,8 +34,8 @@ Now test the install with
 
 ## What happens during the install...
 
-1. `expat` is installed using `yum`. See below if you are using a
-system other than RedHat/CentOS/Fedora.
+1. `expat` and `wget` are installed using `yum`. See below if you are
+using a system other than RedHat/CentOS/Fedora.
 
 2. CPAN is updated and the Module::Build module is installed. Other
 Perl dependencies are then installed using CPAN including Moose and
@@ -52,8 +52,8 @@ packages.
 ## I am not using *RedHat/CentOS/Fedora*. What do I do?
 
 The only requirement for RedHat-style Linux is for the yum
-installation tool. This is used only to install `expat`. If you are
-using another Linux version, then install `expat` using your package
-manager (e.g. `apt-get`) and comment out the line:
+installation tool. This is used only to install `expat` and `wget`. If
+you are using another Linux version, then install `expat` and `wget`
+using your package manager (e.g. `apt-get`) and comment out the line:
 
-```sudo yum -y install expat```
+```sudo yum -y install expat wget```

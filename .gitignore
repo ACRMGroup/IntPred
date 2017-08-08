@@ -3,3 +3,4 @@ bin/createAnjaPredDataSet.pl
 data/consScores/FOSTA/*
 data/consScores/BLAST/*
 data/IntPred/*.model*
+setup.sh

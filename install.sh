@@ -10,6 +10,9 @@ fi
 H=`pwd`
 echo "export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}" >  $H/setup.sh
 echo "export PERL5LIB=$TCNlib/lib:$PERL5LIB"             >> $H/setup.sh
+export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}
+export PERL5LIB=$TCNlib/lib:$PERL5LIB
+
 
 # System preliminaries
 if [ 'x' == 'y' ]; then
@@ -17,7 +20,7 @@ if [ 'x' == 'y' ]; then
 ### Comment this out if you have installed expat using ###
 ### another package manager (i.e. you don't have yum)  ###
 ##########################################################
-sudo yum -y install expat
+sudo yum -y install expat wget
 
 sudo $PERL -MCPAN -e shell <<EOF
 install CPAN
@@ -41,8 +44,8 @@ tar xvf TCNlib-${TCNLIBVERSION}.tar.gz
 cd TCNlib-${TCNLIBVERSION}
 
 ./setup.pl
-export TCNlib=`pwd`
-export PERL5LIB="$TCNlib:$PERL5LIB"
+./setup-blast -f
+
 
 ./runtests.pl  # This needs PyMol
 
