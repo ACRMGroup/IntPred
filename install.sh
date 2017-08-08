@@ -25,12 +25,12 @@ promptUser()
     return 1
 }
 
-echo "export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}" >  $H/setup.sh
-echo "export PERL5LIB=$TCNlib/lib:$PERL5LIB"             >> $H/setup.sh
-echo "export DATADIR=$TCNlib/data"                       >> $H/setup.sh
 export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}
 export PERL5LIB=$TCNlib/lib:$PERL5LIB
 export DATADIR=$TCNlib/data
+echo "export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}" >  $H/setup.sh
+echo "export PERL5LIB=$TCNlib/lib:$PERL5LIB"             >> $H/setup.sh
+echo "export DATADIR=$TCNlib/data"                       >> $H/setup.sh
 
 
 # System preliminaries
