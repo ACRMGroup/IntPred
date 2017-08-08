@@ -11,6 +11,7 @@ fi
 H=`pwd`
 BIOPTOOLSURL="https://github.com/ACRMGroup/bioptools/archive/V${BIOPTOOLSVERSION}.tar.gz"
 
+mkdir -p $H/data/consScores/FOSTA
 
 promptUser()
 {
@@ -88,11 +89,11 @@ if promptUser "Install TCNlib and dependencies?"; then
     if promptUser "Run TCNlib installation tests?"; then
         cd $H/packages/TCNlib-${TCNLIBVERSION}
         ./runtests.pl  # This needs PyMol
+        echo ""
+        echo "*** Please note that the t/pdb/ViewPatch.t test will fail ***"
+        echo "*** if you do not have PyMol installed.                   ***"
+        echo ""
     fi
 fi
 
 
-exit
-
-/disk1/home/amartin/git/IntPred/packages/TCNlib-0.1/bin/chaincontacts
-/disk1/home/amartin/git/IntPred/packages/TCNlib-0.1/data/kyte.hpb
