@@ -22,14 +22,46 @@ Simply run the `install.sh` script:
 
 ```./install.sh```
 
-This will use the version of perl in `/usr/bin/perl`. If you wish to
-use a different perl install then you should do:
+Simply press return to accept all defaults on the initial install.
+When reinstalling you can skip some of the stages if needed.
+
+The deault install will use the version of perl in `/usr/bin/perl`. If
+you wish to use a different perl install then you should do:
 
 ```./install.sh /path/to/perl```
 
 Now test the install with
 
 ```./runTests.sh```
+
+See below for more details of what happens during the install.
+
+## Running IntPred
+
+1. First you need to set environment variables and add the bin
+directory to your path:
+
+```source ./setup.sh```
+
+2. IntPred currently only works with files deposited in the PDB and is
+designed to be able to be run on multiple PDB files in one go. This is done by creating a control file containing, in its simplest form a single line:
+
+```pdb : chain : exclchain```
+
+For example:
+
+```1aut : C : L```
+
+If this line is stored in `1autC.dat`, the program is then run by typing:
+
+```runIntPred.pl 1autC.dat```
+
+This would predict on chain C of PDB file 1aut ignoring chain
+L. `exclchain` may be blank if no chains are to be ignored.
+
+For full details simply run:
+
+```runIntPred.pl```
 
 
 ## What happens during the install...
