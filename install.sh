@@ -41,10 +41,11 @@ sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
 # TCNlib
 cd packages
 tar xvf TCNlib-${TCNLIBVERSION}.tar.gz
+./installScripts/fixTCNInstallDirs.sh TCNlib-${TCNLIBVERSION}
 cd TCNlib-${TCNLIBVERSION}
 
 ./setup.pl
-./setup-blast -f
+./setup-blastdb -f
 
 
 ./runtests.pl  # This needs PyMol
