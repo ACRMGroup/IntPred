@@ -12,6 +12,7 @@ H=`pwd`
 BIOPTOOLSURL="https://github.com/ACRMGroup/bioptools/archive/V${BIOPTOOLSVERSION}.tar.gz"
 
 mkdir -p $H/data/consScores/FOSTA
+mkdir -p $H/data/consScores/BLAST
 
 promptUser()
 {
