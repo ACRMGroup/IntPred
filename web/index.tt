@@ -51,6 +51,8 @@
        <p>
          You can download IntPred to run locally
          from <a href='http://www.github.com/ACRMGroup/IntPred/'>GitHub</a>.
+         The install script will automatically download and install all
+         dependencies.
        </p>
      </div>
    </div>
