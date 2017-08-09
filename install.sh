@@ -31,7 +31,8 @@ export DATADIR=$TCNlib/data
 echo "export TCNlib=$H/packages/TCNlib-${TCNLIBVERSION}" >  $H/setup.sh
 echo "export PERL5LIB=\$TCNlib/lib:\$PERL5LIB"           >> $H/setup.sh
 echo "export DATADIR=\$TCNlib/data"                      >> $H/setup.sh
-echo "export PATH=$H/bin:\$PATH"                         >> $H/setup.sh
+echo "export INTPREDBIN=$H/bin"                          >> $H/setup.sh
+echo "export PATH=$INTPREDBIN:\$PATH"                    >> $H/setup.sh
 
 
 # System preliminaries
