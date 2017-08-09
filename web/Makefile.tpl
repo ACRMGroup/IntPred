@@ -13,6 +13,7 @@ clean:
 
 install:
 	cp -Rcp * $(DEST)
+	cp htaccess $(DEST)/.htaccess
 	find $(DEST) -name '*.tt' -exec rm -f {} \;
 	chmod 1777 $(IPBIN)
 	chmod 0555 $(IPBIN)/*
