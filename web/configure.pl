@@ -12,6 +12,8 @@ linkfile($config{'footer'}, 'footer.tt', 1);
 
 ttSubstitute('Makefile.tpl', 'Makefile', %config);
 
+# MakeDir($config{'httpdhome'} . "/
+
 
 #*************************************************************************
 #> ttSubstitute($inFile, $outFile, %config)
