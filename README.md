@@ -1,6 +1,3 @@
-# >>> Still need to install SwissProt <<< #
-
-
 IntPred
 =======
 
@@ -10,6 +7,16 @@ IntPred is a library for the prediction of protein-protein interface
 sites from PDB structures. The library can be used to generate
 features from PDB files, create datasets, train and/or test a learner
 and generate prediction labels for unlabelled protein structures.
+
+## Installation - Quick Guide
+
+```
+wget https://github.com/ACRMGroup/IntPred/archive/v0.1.tar.gz
+tar xvf v0.1.tar.gz
+cd IntPred-0.1
+./install.pl
+source ./setup.sh
+```
 
 ## Installation
 
@@ -54,7 +61,12 @@ For example:
 
 If this line is stored in `1autC.dat`, the program is then run by typing:
 
-```runIntPred.pl 1autC.dat```
+```
+cd $INTPREDBIN
+./runIntPred.pl /path/to/1autC.dat > /path/to/1autC.out
+```
+
+*Note that you must be in the $INTPREDBIN directory to run the program.*
 
 This would predict on chain C of PDB file 1aut ignoring chain
 L. `exclchain` may be blank if no chains are to be ignored.
