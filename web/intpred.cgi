@@ -35,8 +35,8 @@ sub main
 
     my $ctrlFile = WriteControlFile($pdb, $chain, @chains);
     PrintErrorPage("Control file does not exist: $ctrlFile") if(! -e $ctrlFile);    
-#    my $result = RunIntPredTest($ctrlFile, $ipbin);
-    my $result = RunIntPred($ctrlFile, $ipbin);
+    my $result = RunIntPredTest($ctrlFile, $ipbin);
+#    my $result = RunIntPred($ctrlFile, $ipbin);
     PrintResultPage($result, $pdb);
 
     unlink $ctrlFile;

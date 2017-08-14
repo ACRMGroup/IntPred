@@ -8,6 +8,8 @@
     <script src="bootstrap/assets/js/jquery.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
 -->
+<!--
     <script src="mpautotooltip.js"></script>
+-->
   </body>
 </html>
