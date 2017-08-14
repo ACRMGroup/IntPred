@@ -88,7 +88,7 @@ if promptUser "Install TCNlib and dependencies?"; then
     cd $H
     ./installScripts/fixTCNInstallDirs.sh TCNlib-${TCNLIBVERSION}
     cd $H/packages/TCNlib-${TCNLIBVERSION}
-    yes | sudo $PERL ./setup.pl
+    ./setup.pl -perl=$PERL
 
     if promptUser "Download and install BLAST database?"; then
         ./setup-blastdb -f
