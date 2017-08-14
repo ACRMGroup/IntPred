@@ -43,7 +43,7 @@ if promptUser "Install system files and update CPAN?"; then
     ##########################################################
     sudo yum -y install expat wget perl-CPAN libxml2 libxml2-devel java-1.8.0-openjdk
 
-    sudo yes | sudo $PERL -MCPAN -e shell <<EOF
+    yes | sudo $PERL -MCPAN -e shell <<EOF
 install YAML
 install CPAN
 reload cpan
@@ -54,7 +54,10 @@ EOF
 fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
-    sudo yes | sudo $PERL -MCPAN -e shell <<EOF
+    yes | sudo $PERL -MCPAN -e shell <<EOF
+install Config::IniFiles
+install MooseX:Aliases
+install Test::Class::Moose
 install CPAN::Meta
 install CPAN::Meta::YAML
 install ExtUtils::CBuilder
@@ -63,6 +66,7 @@ install Parse::CPAN::Meta
 install Perl::OSType
 install TAP::Harness
 install version
+install List::Util
 EOF
     # Install other dependencies
     yes | sudo $PERL ./installScripts/getperldeps.pl
