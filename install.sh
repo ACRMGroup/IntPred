@@ -54,6 +54,16 @@ EOF
 fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
+    sudo $PERL -MCPAN -e shell <<EOF
+install CPAN::Meta
+install CPAN::Meta::YAML
+install ExtUtils::CBuilder
+install Module::Metadata
+install Parse::CPAN::Meta
+install Perl::OSType
+install TAP::Harness
+install version
+EOF
     # Install other dependencies
     sudo $PERL ./installScripts/getperldeps.pl
     # Install BioPerl
