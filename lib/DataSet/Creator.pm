@@ -377,27 +377,42 @@ sub _getArgFromPDBAndComplexChainAref {
 
 sub getInterfaceResidues {
     my $self = shift;
-
-    my @interfaceResidues = ();
+    my %interfaceResidues = ();
     
     if ($self->model->hasInterfaceResIDs) {
         foreach my $chain (@{$self->targetChains}) {
-            croak "Target chain " . $chain->pdbID . " has no interface residues"
+            croak "Target chain " . $chain->pdbID
+                . " has no interface residues"
                 . " as specified by the user."
                 if ! exists $self->model->interfaceResIDs->{$chain->pdbID};
 
-            push(@interfaceResidues,
-                 @{$self->model->interfaceResIDs->{$chain->pdbID}});
+            map {$interfaceResidues{$_} = 1}
+                @{$self->model->interfaceResIDs->{$chain->pdbID}};
         }
     }
     else {
         my $r2A  = $self->complexResID2RelASAHref();
-        my @interfaceResidues = ();
         foreach my $chain (@{$self->targetChains}) {
-            push(@interfaceResidues, $chain->getInterfaceResidues($r2A));
+            map {$interfaceResidues{$_} = 1}
+                $chain->getInterfaceResidues($r2A);
         }
     }
-    return \@interfaceResidues;
+
+    if ($self->model->has_residueLabelOutputFH) {
+        my %targetChainIDToChain
+            = map {$_->chain_id => $_} @{$self->targetChains};
+        foreach my $resID (keys %{$self->complexResID2RelASAHref}) {
+            my ($resChain, $resSeq) = split(/\./, $resID);
+            if (exists $targetChainIDToChain{$resChain}) {
+                my $chain = $targetChainIDToChain{$resChain};
+                my $label = join(":", $chain->pdb_code, $chain->chain_id,
+                                 $resSeq,
+                                 exists $interfaceResidues{$resID} ? 1 : 0);
+                print {$self->model->residueLabelOutputFH}  $label . "\n";
+            }
+        }
+    }
+    return [keys %interfaceResidues];
 }
 
     
