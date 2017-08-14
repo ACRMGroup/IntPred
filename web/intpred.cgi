@@ -644,6 +644,8 @@ sub PrintResultPage
       </div>
       <div class='panel-body'>
          <input type='button' value='Hide Results' onclick='hideResults()' />
+         <br />
+         <br />
          $msg
       </div>
     </div>
@@ -679,8 +681,6 @@ sub Prettify
     my @warnings = grep(!/^$pdb/, @lines);
     if(scalar(@warnings))
     {
-
-        $out .= "<br /><br />\n";
         $out .= "<div class='alert alert-warning'>\n";
 
         $out .= "<button type='button' class='close' data-dismiss='alert' aria-label='Close' style='margin: -10px -5px 0 0; padding: 0;'>\n";
