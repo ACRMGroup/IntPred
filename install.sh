@@ -59,6 +59,7 @@ force install Config::IniFiles
 force install MooseX:Aliases
 force install Test::Class::Moose
 force install Test::Output
+force install Test::NoWarnings
 force install CPAN::Meta
 force install CPAN::Meta::YAML
 force install ExtUtils::CBuilder
@@ -69,6 +70,7 @@ force install TAP::Harness
 force install version
 force install List::Util
 force install List::MoreUtils
+force install HTML::Entities 
 EOF
     # Install other dependencies
     yes | sudo $PERL ./installScripts/getperldeps.pl
