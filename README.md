@@ -78,7 +78,7 @@ For full details simply run:
 
 ## What happens during the install...
 
-1. `expat`, `wget`, `libxml2`, `libxml2-devel` and
+1. `expat`, `wget`, `perl-CPAN`, `libxml2`, `libxml2-devel` and
 `java-1.8.0-openjdk` are installed using `yum`. See below if you are
 using a system other than RedHat/CentOS/Fedora.
 
@@ -98,11 +98,11 @@ packages.
 
 The only requirement for RedHat-style Linux is for the yum
 installation tool. This is used only to install `expat`, `wget`,
-`libxml2`, `libxml2-devel` and `java-1.8.0-openjdk`. If you are using
-another Linux version then, from the install.sh script, comment out
-the line:
+`perl-CPAN`, `libxml2`, `libxml2-devel` and `java-1.8.0-openjdk`. If
+you are using another Linux version then, from the install.sh script,
+comment out the line:
 
-```sudo yum -y install expat wget libxml2 libxml2-devel java-1.8.0-openjdk```
+```sudo yum -y install expat wget perl-CPAN libxml2 libxml2-devel java-1.8.0-openjdk```
 
 Install these packages using your package manager (e.g. `apt-get`) and
 then run the install script.
