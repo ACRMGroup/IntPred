@@ -128,3 +128,31 @@ comment out the line:
 
 Install these packages using your package manager (e.g. `apt-get`) and
 then run the install script.
+
+## Installation problems
+
+If you get repeated errors during Perl CPAN installs along the lines of
+
+```CPAN::Meta::Requirements not available at ...```
+
+then you may need to install this module manually. Download and install with:
+
+```
+cd /var/tmp
+wget http://www.cpan.org/authors/id/D/DA/DAGOLDEN/CPAN-Meta-Requirements-2.140.tar.gz
+tar xvf CPAN-Meta-Requirements-2.140.tar.gz
+cd CPAN-Meta-Requirements-2.140
+perl Makefile.PL
+make all
+make test && sudo make install
+```
+
+then re-run `install.sh`
+
+Note that all tests on TCNlib should pass (except the ones that
+require PyMol if you don't have that installed). If they don't then
+something has probably gone wrong with the Perl module installs. Check
+for error messages and then use CPAN to install the missing modules;
+if there have been problems with `CPAN-Meta-Requirements` then you
+will probably have to do this one at a time checking the dependencies
+manually.
