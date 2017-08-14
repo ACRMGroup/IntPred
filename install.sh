@@ -41,7 +41,7 @@ if promptUser "Install system files and update CPAN?"; then
     ### Comment this out if you have installed expat using ###
     ### another package manager (i.e. you don't have yum)  ###
     ##########################################################
-    sudo yum -y install expat wget libxml2 libxml2-devel
+    sudo yum -y install expat wget libxml2 libxml2-devel java-1.8.0-openjdk
 
     sudo $PERL -MCPAN -e shell <<EOF
 install CPAN

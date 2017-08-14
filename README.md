@@ -78,9 +78,9 @@ For full details simply run:
 
 ## What happens during the install...
 
-1. `expat`, `wget`, `libxml2` and `libxml2-devel` are installed using
-`yum`. See below if you are using a system other than
-RedHat/CentOS/Fedora.
+1. `expat`, `wget`, `libxml2`, `libxml2-devel` and
+`java-1.8.0-openjdk` are installed using `yum`. See below if you are
+using a system other than RedHat/CentOS/Fedora.
 
 2. CPAN is updated and the Module::Build module is installed. Other
 Perl dependencies are then installed using CPAN including Moose and
@@ -98,8 +98,11 @@ packages.
 
 The only requirement for RedHat-style Linux is for the yum
 installation tool. This is used only to install `expat`, `wget`,
-`libxml2` and `libxml2-devel`. If you are using another Linux version,
-then install these packages using your package manager
-(e.g. `apt-get`) and comment out the line:
+`libxml2`, `libxml2-devel` and `java-1.8.0-openjdk`. If you are using
+another Linux version then, from the install.sh script, comment out
+the line:
 
-```sudo yum -y install expat wget libxml2 libxml2-devel```
+```sudo yum -y install expat wget libxml2 libxml2-devel java-1.8.0-openjdk```
+
+Install these packages using your package manager (e.g. `apt-get`) and
+then run the install script.
