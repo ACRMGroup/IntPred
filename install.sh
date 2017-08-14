@@ -58,6 +58,7 @@ if promptUser "Install Perl dependencies including BioPerl?"; then
 force install Config::IniFiles
 force install MooseX:Aliases
 force install Test::Class::Moose
+force install Test::Output
 force install CPAN::Meta
 force install CPAN::Meta::YAML
 force install ExtUtils::CBuilder
@@ -67,6 +68,7 @@ force install Perl::OSType
 force install TAP::Harness
 force install version
 force install List::Util
+force install List::MoreUtils
 EOF
     # Install other dependencies
     yes | sudo $PERL ./installScripts/getperldeps.pl
@@ -86,7 +88,7 @@ if promptUser "Install TCNlib and dependencies?"; then
     cd $H
     ./installScripts/fixTCNInstallDirs.sh TCNlib-${TCNLIBVERSION}
     cd $H/packages/TCNlib-${TCNLIBVERSION}
-    ./setup.pl
+    ./setup.pl -perl=$PERL
 
     if promptUser "Download and install BLAST database?"; then
         ./setup-blastdb -f
