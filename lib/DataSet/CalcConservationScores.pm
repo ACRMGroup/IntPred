@@ -97,7 +97,7 @@ sub BLAST {
         last if $hitCount == $hitMax;
     }
 
-    printf "INFO: %s hit seqs obtained\n", scalar @gitSeqs;
+    printf "INFO: %s hit seqs obtained\n", scalar @hitSeqs;
 
     croak "Number of sequences returned by BLAST search does not reach minimum!"
         . " number returned = " . @hitSeqs . ", minimum = " . $hitMin
