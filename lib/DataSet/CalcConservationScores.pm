@@ -89,7 +89,7 @@ sub BLAST {
     
     foreach my $hit (@hits) {
 	my $hitSeq = $blaster->reportHandler->swissProtSeqFromHit($hit);
-        print "Failed to get sequence for hit $hit, $@" && next
+        print "WARNING: Failed to get sequence for hit $hit, $@" && next
             if ! $hitSeq;
         
         push(@hitSeqs, $hitSeq);
@@ -97,7 +97,7 @@ sub BLAST {
         last if $hitCount == $hitMax;
     }
 
-    print scalar @hitSeqs, " hit seqs obtained\n";
+    printf "INFO: %s hit seqs obtained\n", scalar @gitSeqs;
 
     croak "Number of sequences returned by BLAST search does not reach minimum!"
         . " number returned = " . @hitSeqs . ", minimum = " . $hitMin
@@ -129,30 +129,30 @@ sub FOSTA {
     # Avoid sending pqs codes (e.g. 1afs_1 and instead send the base PDB code)
     my ($pdbCode) = $chain->pdb_code =~ /_/ ? $chain->pdb_code =~ /(.*)_/
         : $chain->pdb_code;
-    print "Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
+    print "INFO: Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
     my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
                                                          $chain->chain_id);
-    print "ac = @sprot_ac\n";
+    print "INFO: ac = @sprot_ac\n";
     croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
     my $sprot_ac = $sprot_ac[0];
     my $FASTAStr = UNIPROT::GetFASTA($sprot_ac, -remote => 1);
     my $sprot_id = UNIPROT::parseIDFromFASTAStr($FASTAStr);
     
-    print "Getting sequence for query, id=$sprot_id ...\n";
+    print "INFO: Getting sequence for query, id=$sprot_id ...\n";
     my $spSeq    = sequence->new($FASTAStr);
     
-    print "Getting FEP sequences ...\n";
+    print "INFO: Getting FEP sequences ...\n";
     # get functionally equivalent protein sequences
     my @FEPseqs = $findFFs->getReliableFEPSequencesFromSwissProtID($sprot_id);
-    print scalar @FEPseqs . " FEP sequences returned\n";
+    printf "INFO: %d FEP sequences returned\n", scalar @FEPseqs;
 
     croak "Num. FEP sequences does not reach minimum!" if @FEPseqs < $hitMin;
     
-    print "Doing FEP sequence alignment ...\n";
+    print "INFO: Doing FEP sequence alignment ...\n";
     my @muscleArg = (seqs => [$spSeq, @FEPseqs]);
     my $MSA = MSA::Muscle::Factory->new(remote => 0)->getMuscle(@muscleArg);
 
-    print "Calculating conservation scores for query residues\n";
+    print "INFO: Calculating conservation scores for query residues\n";
     $MSA->consScoreCalculator(scorecons->new(targetSeqIndex => 0));
     my @consScores = $MSA->calculateConsScores();
     return mapResSeq2conScore($pdbCode, $chain->chain_id(), $sprot_ac, \@consScores, $pdbsws); 
@@ -165,14 +165,14 @@ sub mapResSeq2conScore {
     my $consScoresAref = shift;
     my $pdbsws         = shift;
     
-    print "Mapping chain resSeqs to SwissProt numbering ...\n";
+    print "INFO: Mapping chain resSeqs to SwissProt numbering ...\n";
     # Get ChainResSeq -> SwissProtNum map
     my %resSeq2SprotNum
         = $pdbsws->mapResSeq2SwissProtNum($pdbCode,
                                           $chainID,
                                           $sprot_ac);
     
-    print "Mapping SwissProt numbering to conservation scores ...\n";
+    print "INFO: Mapping SwissProt numbering to conservation scores ...\n";
     # Get SwissProtNum -> conservation scores map
     my %sprotNum2consScore = mapSprotNum2conScore(@{$consScoresAref});
 
