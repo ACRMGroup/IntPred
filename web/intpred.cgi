@@ -673,6 +673,7 @@ sub Prettify
     @lines = grep(!/^Running/, @lines);
     @lines = grep(!/^Finished/, @lines);
     @lines = grep(!/^done/, @lines);
+    @lines = grep(!/^INFO:/, @lines);
 
     # Anything that isn't the results
     my @warnings = grep(!/^$pdb/, @lines);
