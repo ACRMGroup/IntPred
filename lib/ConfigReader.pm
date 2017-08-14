@@ -98,8 +98,18 @@ sub createInstanceModel {
 
     $model->consScoresDir($self->_getPathForVal(qw(DataSetCreation consScoresDir)))
         if $self->exists(qw(DataSetCreation consScoresDir));
+
+    $model->residueLabelOutputFH($self->_getResidueLabelOutputFH)
+        if $self->exists(qw(DataSetCreation residueLabelOutFile));
     
     return $model;
+}
+
+sub _getResidueLabelOutputFH {
+    my $self = shift;
+    my $file = $self->_getPathForVal(qw(DataSetCreation residueLabelOutFile));
+    open(my $FH, ">", $file) or die "Cannot open file $file, $!";
+    return $FH;
 }
 
 sub createPropCalc {
