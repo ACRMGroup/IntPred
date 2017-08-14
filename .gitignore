@@ -3,3 +3,7 @@ bin/createAnjaPredDataSet.pl
 data/consScores/FOSTA/*
 data/consScores/BLAST/*
 data/IntPred/*.model*
+setup.sh
+packages/bioptools-1.4.tar.gz
+packages/bioptools-1.4/
+packages/TCNlib-0.1/
