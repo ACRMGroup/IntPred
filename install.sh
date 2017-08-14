@@ -55,6 +55,7 @@ fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
     yes | sudo $PERL -MCPAN -e shell <<EOF
+Build installdeps
 install Config::IniFiles
 install MooseX:Aliases
 install Test::Class::Moose
@@ -67,6 +68,7 @@ install Perl::OSType
 install TAP::Harness
 install version
 install List::Util
+Build installdeps
 EOF
     # Install other dependencies
     yes | sudo $PERL ./installScripts/getperldeps.pl
