@@ -65,9 +65,9 @@ install TAP::Harness
 install version
 EOF
     # Install other dependencies
-    sudo $PERL ./installScripts/getperldeps.pl
+    yes | sudo $PERL ./installScripts/getperldeps.pl
     # Install BioPerl
-    sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
+    yes | sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
 fi
 
 if promptUser "Download and install the IntPred model file?"; then
