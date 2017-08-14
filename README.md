@@ -40,7 +40,8 @@ can select one from http://www.cpan.org/SITES.html - for example
 ftp://mirror.ox.ac.uk/sites/www.cpan.org/
 
 Then enter
-```o conf commit
+```
+o conf commit
 quit
 ```
 
