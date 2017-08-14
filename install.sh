@@ -90,7 +90,7 @@ if promptUser "Install TCNlib and dependencies?"; then
     cd $H
     ./installScripts/fixTCNInstallDirs.sh TCNlib-${TCNLIBVERSION}
     cd $H/packages/TCNlib-${TCNLIBVERSION}
-    ./setup.pl -perl=$PERL
+    $PERL ./setup.pl -perl=$PERL
 
     if promptUser "Download and install BLAST database?"; then
         ./setup-blastdb -f
@@ -102,7 +102,7 @@ if promptUser "Install TCNlib and dependencies?"; then
         mv V${BIOPTOOLSVERSION}.tar.gz bioptools-${BIOPTOOLSVERSION}.tar.gz
         tar xvf bioptools-${BIOPTOOLSVERSION}.tar.gz
         cd $H/packages/bioptools-${BIOPTOOLSVERSION}/src
-        ./makemake.pl -bioplib -prefix=${TCNlib}
+        $PERL ./makemake.pl -bioplib -prefix=${TCNlib}
         make
         make install
         cp -Rp libsrc/bioplib/data/* $TCNlib/data
@@ -110,7 +110,7 @@ if promptUser "Install TCNlib and dependencies?"; then
 
     if promptUser "Run TCNlib installation tests?"; then
         cd $H/packages/TCNlib-${TCNLIBVERSION}
-        ./runtests.pl  # This needs PyMol
+        $PERL ./runtests.pl  # This needs PyMol
         echo ""
         echo "*** Please note that the t/pdb/ViewPatch.t test will fail ***"
         echo "*** if you do not have PyMol installed.                   ***"
