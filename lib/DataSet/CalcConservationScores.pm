@@ -129,7 +129,7 @@ sub FOSTA {
     # Avoid sending pqs codes (e.g. 1afs_1 and instead send the base PDB code)
     my ($pdbCode) = $chain->pdb_code =~ /_/ ? $chain->pdb_code =~ /(.*)_/
         : $chain->pdb_code;
-<<<<<<< HEAD
+
     print "Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
     my @sprot_ac  = eval {$pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
                                                                $chain->chain_id)};
@@ -137,13 +137,9 @@ sub FOSTA {
         croak "Failed to obtain an SwissProt AC for pdb $pdbCode, chain "
             . $chain->chain_id . ", unable to obtain a FOSTA score without one.";
     }
-    print "ac = @sprot_ac\n";
-=======
-    print "INFO: Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
-    my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
-                                                         $chain->chain_id);
+    
     print "INFO: ac = @sprot_ac\n";
->>>>>>> cddd964908d0d9ab0ec1c29572ed2fdcdcbc89f5
+
     croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
     my $sprot_ac = $sprot_ac[0];
     my $FASTAStr = UNIPROT::GetFASTA($sprot_ac, -remote => 1);
