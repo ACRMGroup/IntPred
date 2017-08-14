@@ -54,7 +54,7 @@ EOF
 fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
-    sudo $PERL -MCPAN -e shell <<EOF
+    sudo yes | $PERL -MCPAN -e shell <<EOF
 install CPAN::Meta
 install CPAN::Meta::YAML
 install ExtUtils::CBuilder
