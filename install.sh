@@ -55,6 +55,17 @@ fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
     yes | sudo $PERL -MCPAN -e shell <<EOF
+force install Math::VectorReal
+force install Parallel::ForkManager
+force install IO::CaptureOutput
+force install XML::Simple
+force install Statistics::PCA
+force install XML::DOM
+force install TryCatch
+force install Test::MockObject::Extends
+force install Math::MatrixReal
+force install MooseX::ClassAttribute
+force install Moose
 force install Config::IniFiles
 force install MooseX:Aliases
 force install Test::Class::Moose
