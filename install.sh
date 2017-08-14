@@ -57,6 +57,7 @@ fi
 
 if promptUser "Install Perl dependencies including BioPerl?"; then
     yes | sudo $PERL -MCPAN -e shell <<EOF
+force install CPAN::Meta::Requirements
 force install Math::VectorReal
 force install Parallel::ForkManager
 force install IO::CaptureOutput
