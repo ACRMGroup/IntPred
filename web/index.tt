@@ -41,9 +41,11 @@
         <input type='button' value='Submit' id='submit' onclick='DisplayPage()' />
       </p>
       
-      <div id='throbber' style='display:none;'><img src='throbber.gif' />Please wait, this may take a couple of minutes...</div>
-      <div id='results'>&nbsp;</div>
+      <div id='throbber' style='display:none;'><img src='throbber.gif' /> Please wait, this may take a couple of minutes...</div>
     </div>
+  </div>
+
+  <div id='results' style='display:none;'>
   </div>
 
   <div class='panel panel-default'>

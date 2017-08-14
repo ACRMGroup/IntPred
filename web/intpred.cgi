@@ -1,10 +1,65 @@
 #!/usr/bin/perl
-
+#*************************************************************************
+#
+#   Program:    IntPred
+#   File:       intpred.cgi
+#   
+#   Version:    V1.0
+#   Date:       14.08.17
+#   Function:   CGI script for IntPred
+#   
+#   Copyright:  (c) Dr. Andrew C. R. Martin, UCL, 2017
+#   Author:     Dr. Andrew C. R. Martin
+#   Address:    Institute of Structural and Molecular Biology
+#               Division of Biosciences
+#               University College
+#               Gower Street
+#               London
+#               WC1E 6BT
+#   EMail:      andrew@bioinf.org.uk
+#               
+#*************************************************************************
+#
+#   This program is not in the public domain, but it may be copied
+#   according to the conditions laid out in the accompanying file
+#   COPYING.DOC
+#
+#   The code may be modified as required, but any modifications must be
+#   documented so that the person responsible can be identified. If 
+#   someone else breaks this code, I don't want to be blamed for code 
+#   that does not work! 
+#
+#   The code may not be sold commercially or included as part of a 
+#   commercial product except as described in the file COPYING.DOC.
+#
+#*************************************************************************
+#
+#   Description:
+#   ============
+#
+#*************************************************************************
+#
+#   Usage:
+#   ======
+#
+#*************************************************************************
+#
+#   Revision History:
+#   =================
+#   V1.0   14.08.17   Original   By: ACRM
+#
+#*************************************************************************
 use CGI;
 use config;
 
 main();
 
+#-------------------------------------------------------------------------
+# main()
+# ------
+# Main program
+#
+# 14.08.17 Original   By: ACRM
 sub main
 {
     my $cgi = new CGI;
@@ -35,22 +90,32 @@ sub main
 
     my $ctrlFile = WriteControlFile($pdb, $chain, @chains);
     PrintErrorPage("Control file does not exist: $ctrlFile") if(! -e $ctrlFile);    
-    my $result = RunIntPredTest($ctrlFile, $ipbin);
-#    my $result = RunIntPred($ctrlFile, $ipbin);
+#    my $result = RunIntPredTest($ctrlFile, $ipbin);
+    my $result = RunIntPred($ctrlFile, $ipbin);
     PrintResultPage($result, $pdb);
 
     unlink $ctrlFile;
 }
 
+
+#-------------------------------------------------------------------------
+# RunIntPredTest($ctrlFile, $ipbin)
+# ---------------------------------
+# Input:   $ctrlFile    Ignored
+#          $ipbin       Ignored
+# Returns:              The results from IntPred 
+#
+# A test version of the code to run IntPred - it just returns a known 
+# output from the program
+#
+# 14.08.17 Original   By: ACRM
 sub RunIntPredTest
 {
     my ($ctrlFile, $ipbin) = @_;
 
     my $result = "DataSet::Creator::Master - new child DataSet::Creator::PDB - 1yqv
 DataSet::Creator::PDB - 1yqv - new child DataSet::Creator::Complex - Target Chains: L Complex Chains: H, Y
-NoA FOSTA scores obtained for 1yqvL: Some shiz
-NoB FOSTA scores obtained for 1yqvL: NoC BLAST scores obtained for 1yqvL: 
-NoD BLAST scores obtained for 1yqvL: Some shiz
+No FOSTA scores obtained for 1yqvL: No BLAST scores obtained for 1yqvL: 
 DataSet::Creator::Complex - Target Chains: L Complex Chains: H, Y - new child DataSet::Creator::Chain - 1yqvL
 DataSet::Creator::Chain - 1yqvL - new child DataSet::Creator::Patch - 1yqv:L.98
 DataSet::Creator::Patch - 1yqv:L.98 - new child DataSet::Instance
@@ -435,6 +500,17 @@ Finished!";
     return($result);
 }
 
+
+#-------------------------------------------------------------------------
+# RunIntPred($ctrlFile, $ipbin)
+# -----------------------------
+# Input:   $ctrlFile    The control file for IntPred
+#          $ipbin       The bin directory where runIntPred.pl lives
+# Returns:              The results from IntPred 
+#
+# Runs IntPred and returns the results
+#
+# 14.08.17 Original   By: ACRM
 sub RunIntPred
 {
     my ($ctrlFile, $ipbin) = @_;
@@ -442,6 +518,18 @@ sub RunIntPred
     return($result);
 }
 
+
+#-------------------------------------------------------------------------
+# WriteControlFile($pdb, $chain, @chains)
+# ---------------------------------------
+# Input:   $pdb    The PDB code
+#          $chain  The chain to analyze
+#          @chains Chains to ignore
+# Returns:         Full path to control file
+#
+# Writes a control file for IntPred
+#
+# 14.08.17 Original   By: ACRM
 sub WriteControlFile
 {
     my ($pdb, $chain, @chains) = @_;
@@ -469,6 +557,16 @@ sub WriteControlFile
     return($ctrlFile);
 }
 
+
+#-------------------------------------------------------------------------
+# GetPDBChainList($pdbfile)
+# -------------------------
+# Input:   $pdbfile   Full path to a PDB file
+# Returns:            Array of PDB chains
+#
+# Gets the list of chains present in a PDB file
+#
+# 14.08.17 Original   By: ACRM
 sub GetPDBChainList
 {
     my($pdbfile)  = @_;
@@ -491,24 +589,39 @@ sub GetPDBChainList
 }
 
 
-
+#-------------------------------------------------------------------------
+# PrintErrorPage($msg)
+# --------------------
+# Input:  $msg   An error message
+# 
+# Prints an error message page
+#
+# 14.08.17 Original   By: ACRM
 sub PrintErrorPage
 {
     my($msg) = @_;
 
     print <<__EOF;
-<html>
-<head>
-<title>IntPred Error</title>
-</head>
-<body>
-<h1>IntPred Error</h1>
-<p>$msg</p>
-</body>
-</html>
+    <div class='alert alert-danger'>
+      <button type='button' class='close' data-dismiss='alert' aria-label='Close' style='margin: -10px -5px 0 0; padding: 0;'>
+        <span aria-hidden='true'>&times;</span>
+      </button>
+      <h3 style='margin-top: -5px;'>Error</h3>
+      <p>$msg</p>
+    </div>
 __EOF
 }
 
+
+#-------------------------------------------------------------------------
+# PrintResultPage($msg, $pdb)
+# ---------------------------
+# Input:  $msg   The output from IntPred for printing
+#         $pdb   The PDB code that we are analyzing
+#
+# Print a result page
+#
+# 14.08.17 Original   By: ACRM
 sub PrintResultPage
 {
     my($msg, $pdb) = @_;
@@ -516,22 +629,39 @@ sub PrintResultPage
     $msg = Prettify($msg, $pdb);
 
     print <<__EOF;
-<html>
-<head>
-<title>IntPred Result</title>
-<style type='text/css'>
-.noif { }
-.if {color: red}
-</style>
-</head>
-<body>
-<h1>IntPred Result</h1>
-$msg
-</body>
-</html>
+    <style type='text/css'>
+       .noif { }
+       .if {color: #c34442; font-weight: bold;}
+       table, tr, td, th {border: none}
+       th {border-bottom: 1pt solid black;
+           border-top: 1pt solid black;}
+       .alert-secondary {background: #f3f3f3;
+                         border: 1px solid #e6e6e6;}
+    </style>
+    <div class='panel panel-default'>
+      <div class='panel-heading'>
+        <h2 class='panel-title'>Prediction results</h2>
+      </div>
+      <div class='panel-body'>
+         <input type='button' value='Hide Results' onclick='hideResults()' />
+         $msg
+      </div>
+    </div>
 __EOF
 }
 
+
+#-------------------------------------------------------------------------
+# Prettify($in, $pdb)
+# -------------------
+# Input:   $in    The raw IntPred output
+#          $pdb   The PDB code we are analyzing
+# Returns:        Prettified HTML version
+#
+# Takes the raw output from IntPred and makes it into a prettier HTML
+# version
+#
+# 14.08.17 Original   By: ACRM
 sub Prettify
 {
     my($in, $pdb) = @_;
@@ -548,7 +678,15 @@ sub Prettify
     my @warnings = grep(!/^$pdb/, @lines);
     if(scalar(@warnings))
     {
-        $out .= "<h2>Errors/Warnings</h2>\n";
+
+        $out .= "<br /><br />\n";
+        $out .= "<div class='alert alert-warning'>\n";
+
+        $out .= "<button type='button' class='close' data-dismiss='alert' aria-label='Close' style='margin: -10px -5px 0 0; padding: 0;'>\n";
+        $out .= "  <span aria-hidden='true'>&times;</span>\n";
+        $out .= "</button>\n";
+        $out .= "<br />\n";
+
         $out .= "<ul>\n";
 
         foreach my $warning (@warnings)
@@ -574,15 +712,16 @@ sub Prettify
         }
 
         $out .= "</ul>\n";
+        $out .= "</div>\n";
     }
 
     # The results
     @lines = grep(/^$pdb/, @lines);
     if(scalar(@lines))
     {
-        $out .= "<h2>Results</h2>\n";
+        $out .= "<div class='alert alert-secondary'>\n";
         $out .= "<table>\n";
-        $out .= "<tr><th>PDB</th><th>Chain</th><th>Score</th><th>&nbsp;</th></tr>\n";
+        $out .= "<tr><th>Residue</th><th>Score</th><th>&nbsp;</th></tr>\n";
         my $data = '';
         foreach my $line (@lines)
         {
@@ -595,12 +734,14 @@ sub Prettify
                 $class = 'if';
                 $isIF = '(Interface)';
             }
-            $data .= "<tr class='$class'><td>$parts[0]</td><td>$parts[1]$parts[2]</td><td> $fields[1] </td><td>$isIF</td></tr>\n";
+            $data .= "<tr class='$class'><td>$parts[1]$parts[2]</td><td> $fields[1] </td><td>$isIF</td></tr>\n";
         }
 
         $data = `echo "$data" | sort -r -k 3 -n`;
 
-        $out .= $data . "</table>";
+        $out .= $data;
+        $out .= "</table>";
+        $out .= "</div>\n";
     }
 
     return($out);

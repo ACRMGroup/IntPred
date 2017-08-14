@@ -32,6 +32,8 @@ function DisplayPage()
     var chain = document.getElementById("chain").value;
     var url="./intpred.cgi?pdb="+pdb+"&amp;chain="+chain;
 
+    document.getElementById("results").innerHTML      = '';
+    document.getElementById("results").style.display  = 'none';
     document.getElementById("throbber").style.display = 'inline';
     document.getElementById("submit").disabled        = true;
     document.getElementById("pdb").disabled           = true;
@@ -48,9 +50,20 @@ function updatePage()
     if (gRequest.readyState==4 || gRequest.readyState=="complete")
     { 
         document.getElementById("results").innerHTML      = gRequest.responseText;
+        document.getElementById("results").style.display  = 'block';
         document.getElementById("throbber").style.display = 'none';
         document.getElementById("submit").disabled        = false;
         document.getElementById("pdb").disabled           = false;
         document.getElementById("chain").disabled         = false;
     } 
 } 
+
+function hideResults()
+{
+    document.getElementById("results").innerHTML      = '';
+    document.getElementById("results").style.display  = 'none';
+    document.getElementById("throbber").style.display = 'none';
+    document.getElementById("submit").disabled        = false;
+    document.getElementById("pdb").disabled           = false;
+    document.getElementById("chain").disabled         = false;
+}
