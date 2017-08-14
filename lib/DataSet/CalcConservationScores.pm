@@ -130,8 +130,12 @@ sub FOSTA {
     my ($pdbCode) = $chain->pdb_code =~ /_/ ? $chain->pdb_code =~ /(.*)_/
         : $chain->pdb_code;
     print "Getting ac for query chain " . $pdbCode . $chain->chain_id  . " ...\n";
-    my @sprot_ac  = $pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
-                                                         $chain->chain_id);
+    my @sprot_ac  = eval {$pdbsws->getACsFromPDBCodeAndChainID($pdbCode,
+                                                               $chain->chain_id)};
+    if (! @sprot_ac) {
+        croak "Failed to obtain an SwissProt AC for pdb $pdbCode, chain "
+            . $chain->chain_id . ", unable to obtain a FOSTA score without one.";
+    }
     print "ac = @sprot_ac\n";
     croak "Chain is aligned to multiple swiss prot entries!\n" if @sprot_ac > 1;
     my $sprot_ac = $sprot_ac[0];
