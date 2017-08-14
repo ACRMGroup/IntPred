@@ -13,6 +13,7 @@ BIOPTOOLSURL="https://github.com/ACRMGroup/bioptools/archive/V${BIOPTOOLSVERSION
 
 mkdir -p $H/data/consScores/FOSTA
 mkdir -p $H/data/consScores/BLAST
+mkdir -p $H/packages/TCNlib-0.1/data/pdb-cache
 
 promptUser()
 {
