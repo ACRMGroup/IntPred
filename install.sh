@@ -44,6 +44,7 @@ if promptUser "Install system files and update CPAN?"; then
     sudo yum -y install expat wget perl-CPAN libxml2 libxml2-devel java-1.8.0-openjdk
 
     sudo $PERL -MCPAN -e shell <<EOF
+install YAML
 install CPAN
 reload cpan
 install Module::Build

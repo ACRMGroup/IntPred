@@ -25,6 +25,27 @@ below if you are not.
 
 You need to have `sudo` permissions or do the install as `root`.
 
+You are recommended to update your operating system before attempting
+an install with:
+
+```yum update```
+
+If you haven't previously used CPAN to install Perl modules, you may
+need to do the following:
+
+```sudo /usr/bin/perl -MCPAN -e shell```
+
+Simply accept all the defaults, and when asked for a CPAN mirror, you
+can select one from http://www.cpan.org/SITES.html - for example
+ftp://mirror.ox.ac.uk/sites/www.cpan.org/
+
+Then enter
+```o conf commit
+quit
+```
+
+
+
 Simply run the `install.sh` script:
 
 ```./install.sh```
