@@ -11,9 +11,9 @@ and generate prediction labels for unlabelled protein structures.
 ## Installation - Quick Guide
 
 ```
-wget https://github.com/ACRMGroup/IntPred/archive/v0.1.tar.gz
-tar xvf v0.1.tar.gz
-cd IntPred-0.1
+wget https://github.com/ACRMGroup/IntPred/archive/v0.5.tar.gz
+tar xvf v0.5.tar.gz
+cd IntPred-0.5
 ./install.pl
 source ./setup.sh
 ```

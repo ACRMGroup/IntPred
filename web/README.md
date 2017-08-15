@@ -23,3 +23,19 @@ the `config.cfg` file):
 
         make install
 
+Apache Configuration
+--------------------
+
+1. Set the TimeOut
+
+        Timeout 1200
+        ProxyTimeout 1200
+
+2. Ensure that AllowOverride and ExecCGI are set
+
+        <Directory "/var/www/html">
+            Options Indexes FollowSymLinks ExecCGI Includes
+            AllowOverride All
+            Order allow,deny
+            Allow from all
+        </Directory>
