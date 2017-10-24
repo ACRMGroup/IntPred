@@ -6,19 +6,22 @@ This is the code for the IntPred web page.
 Installation
 ------------
 
-1. Create a `config.cfg` file - at UCL this is done with:
+1. Unpack or clone the git distribution in a (temporary) working
+directory.
+
+2. Create a `config.cfg` file - at UCL this is done with:
 
         ln -s config_ucl.cfg config.cfg
 
-2. Run the `configure.pl` script:
+3. Run the `configure.pl` script:
 
         ./configure.pl
 
-3. Build the web pages:
+4. Build the web pages:
 
         make
 
-4. Install the pages on the web site (the destination is specified in
+5. Install the pages on the web site (the destination is specified in
 the `config.cfg` file):
 
         make install

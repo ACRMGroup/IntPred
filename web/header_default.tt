@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="favicon.png">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" crossorigin="anonymous">
+
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" crossorigin="anonymous">
+
+<!-- 
+    <link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+-->
+
+    <!-- Custom styles for this template -->
+    <link href="mptheme.css" rel="stylesheet">
+
+    <!-- And my own useful extras -->
+    <link href="mpcss.css" rel="stylesheet"> 
+
+    <!-- Any style information from the web page -->
+    <style type='text/css'>
+ table {border: 2pt solid black;
+        margin: 1em 0 2em 0;}
+ td, th {padding: 2pt;
+         border: 1pt solid #CCCCCC;}
+ th {border-bottom: 2pt solid black;}
+ .right {text-align: right;}
+ .center, .centre {text-align: center;}
+ </style>
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <title>IntPred: Protein interface prediction</title>
+  </head>
+
+  <body>
+<script src='ajax.js'></script>

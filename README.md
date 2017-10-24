@@ -95,7 +95,7 @@ L. `exclchain` may be blank if no chains are to be ignored.
 
 For full details simply run:
 
-```runIntPred.pl```
+```./runIntPred.pl```
 
 
 ## What happens during the install...
