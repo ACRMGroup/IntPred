@@ -55,7 +55,7 @@ o conf commit
 EOF
 fi
 
-if promptUser "Install Perl dependencies including BioPerl?"; then
+if promptUser "Install Perl dependencies including BioPerl (for the Perl you are using)?"; then
     yes | sudo $PERL -MCPAN -e shell <<EOF
 force install CPAN::Meta::Requirements
 force install Math::VectorReal
@@ -92,12 +92,12 @@ EOF
     yes | sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
 fi
 
-if promptUser "Download and install the IntPred model file?"; then
+if promptUser "Download and install the IntPred model file? (Required for a new install)"; then
     # Download the WEKA model file
     ./installScripts/getIntPredModel.sh
 fi
 
-if promptUser "Install TCNlib and dependencies?"; then
+if promptUser "Install TCNlib and dependencies? (Required for a new install)"; then
    # TCNlib
     cd $H/packages
     tar xvf TCNlib-${TCNLIBVERSION}.tar.gz
@@ -106,11 +106,11 @@ if promptUser "Install TCNlib and dependencies?"; then
     cd $H/packages/TCNlib-${TCNLIBVERSION}
     $PERL ./setup.pl -perl=$PERL
 
-    if promptUser "Download and install BLAST database?"; then
+    if promptUser "Download and install BLAST database? (Required for a new install)"; then
         ./setup-blastdb -f
     fi
 
-    if promptUser "Install BiopTools?"; then
+    if promptUser "Install BiopTools? (Required for a new install)"; then
         cd $H/packages
         wget $BIOPTOOLSURL
         mv V${BIOPTOOLSVERSION}.tar.gz bioptools-${BIOPTOOLSVERSION}.tar.gz
