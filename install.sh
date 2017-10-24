@@ -1,5 +1,5 @@
 ### NOTE! You must run this as root OR have sudo permissions ###
-TCNLIBVERSION=0.1
+TCNLIBVERSION=0.1.1
 BIOPTOOLSVERSION=1.4
 
 if [ "TEST" == "TEST$1" ]; then
@@ -13,7 +13,7 @@ BIOPTOOLSURL="https://github.com/ACRMGroup/bioptools/archive/V${BIOPTOOLSVERSION
 
 mkdir -p $H/data/consScores/FOSTA
 mkdir -p $H/data/consScores/BLAST
-mkdir -p $H/packages/TCNlib-0.1/data/pdb-cache
+mkdir -p $H/packages/TCNlib-${TCNLIBVERSION}/data/pdb-cache
 
 promptUser()
 {
