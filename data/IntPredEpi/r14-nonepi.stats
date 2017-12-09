@@ -1,0 +1,22 @@
+Stats from run: /home/bsm3/zcbtfo4/scripts/lib/CreateAntigenPatches/bin/patchesFromCluster.pl -t -m -e -u -k 14 clusters/ patches-r14/(stats for LABEL=nonepi)
+[type:sum:count:mean]ala:    19383.50:   580:   33.4198
+[type:sum:count:mean]cys:     4813.02:   223:   21.5830
+[type:sum:count:mean]pro:    29578.04:   481:   61.4928
+[type:sum:count:mean]met:     9052.72:   165:   54.8650
+[type:sum:count:mean]arg:    42752.70:   449:   95.2176
+[type:sum:count:mean]lys:    61912.55:   598:  103.5327
+[type:sum:count:mean]asn:    33039.99:   468:   70.5983
+[type:sum:count:mean]gln:    26163.02:   358:   73.0811
+[type:sum:count:mean]gly:    19787.40:   625:   31.6598
+[type:sum:count:mean]his:    14516.77:   211:   68.7999
+[type:sum:count:mean]ser:    25319.95:   591:   42.8426
+[type:sum:count:mean]tyr:    18414.65:   323:   57.0113
+[type:sum:count:mean]asp:    30227.98:   458:   66.0000
+[type:sum:count:mean]trp:     9699.44:   175:   55.4254
+[type:sum:count:mean]thr:    30483.64:   572:   53.2931
+[type:sum:count:mean]val:    22385.33:   596:   37.5593
+[type:sum:count:mean]phe:    13378.19:   310:   43.1555
+[type:sum:count:mean]ile:    17660.37:   429:   41.1664
+[type:sum:count:mean]glu:    50558.31:   632:   79.9973
+[type:sum:count:mean]leu:    33252.22:   729:   45.6135
+total ASA for the dataset is 512379.79
