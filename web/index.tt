@@ -1,7 +1,4 @@
 [% INCLUDE header.tt %]
-
-<script src='ajax.js'></script>
-
 [% INCLUDE menu.tt %]
 
 <div class='container theme-showcase'>
@@ -22,8 +19,17 @@
         and specificity at the expense of
         sensivity. [<a href='paper/intpred.pdf'>Paper as
           submitted</a>][<a href='paper/SupplementaryMaterial.pdf'>Supplementary
-          Material</a>]
+          Material</a>][<a href='paper/Datasets.xls'>Datasets</a>]
       </p>
+
+<!-- Status Messages -->
+<!--
+      <div class='alert alert-info'>
+        24.10.17 Apologies! The server had stopped working owing to a change in
+        where files are stored at the RCSB PDB site. This is now fixed.
+      </div>
+-->
+
     </div>
   </div>
 
@@ -64,4 +70,3 @@
 
 </div> <!-- /container -->
 
-[% INCLUDE footer.tt %]
