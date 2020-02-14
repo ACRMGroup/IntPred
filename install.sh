@@ -44,6 +44,7 @@ if promptUser "Install system files and update CPAN?"; then
     ##########################################################
     sudo yum -y install expat wget perl-CPAN libxml2 libxml2-devel java-1.8.0-openjdk
     sudo yum -y install perl-YAML perl-Test-YAML-Valid perl-Module-Build perl-IO-CaptureOutput
+    sudo yum -y install perl-Devel-Peek
 
     
 #    yes | sudo $PERL -MCPAN -e shell <<EOF
@@ -87,6 +88,10 @@ force install version
 force install List::Util
 force install List::MoreUtils
 force install HTML::Entities 
+force install Bio::Cluster::SequenceFamily
+force install Bio::FeatureIO
+force install File::Sort
+force install Bio::Tools::Run::StandAloneBlast
 EOF
     # Install other dependencies
     yes | sudo $PERL ./installScripts/getperldeps.pl
