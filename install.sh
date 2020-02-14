@@ -1,5 +1,5 @@
 ### NOTE! You must run this as root OR have sudo permissions ###
-TCNLIBVERSION=0.1.1
+TCNLIBVERSION=0.1.2
 BIOPTOOLSVERSION=1.4
 
 if [ "TEST" == "TEST$1" ]; then
@@ -43,16 +43,18 @@ if promptUser "Install system files and update CPAN?"; then
     ### another package manager (i.e. you don't have yum)  ###
     ##########################################################
     sudo yum -y install expat wget perl-CPAN libxml2 libxml2-devel java-1.8.0-openjdk
+    sudo yum -y install perl-YAML perl-Test-YAML-Valid perl-Module-Build perl-IO-CaptureOutput
 
-    yes | sudo $PERL -MCPAN -e shell <<EOF
-force install CPAN
-reload cpan
-force install YAML
-force install Test::YAML
-force install Module::Build
-o conf prefer_installer MB
-o conf commit
-EOF
+    
+#    yes | sudo $PERL -MCPAN -e shell <<EOF
+#force install CPAN
+#reload cpan
+#force install YAML
+#force install Test::YAML
+#force install Module::Build
+#o conf prefer_installer MB
+#o conf commit
+#EOF
 fi
 
 if promptUser "Install Perl dependencies including BioPerl (for the Perl you are using)?"; then
@@ -94,6 +96,7 @@ fi
 
 if promptUser "Download and install the IntPred model file? (Required for a new install)"; then
     # Download the WEKA model file
+### CHECKME
     ./installScripts/getIntPredModel.sh
 fi
 
@@ -104,6 +107,8 @@ if promptUser "Install TCNlib and dependencies? (Required for a new install)"; t
     cd $H
     ./installScripts/fixTCNInstallDirs.sh TCNlib-${TCNLIBVERSION}
     cd $H/packages/TCNlib-${TCNLIBVERSION}
+    ./getexternalpackages
+    ./getperldeps.pl
     $PERL ./setup.pl -perl=$PERL
 
     if promptUser "Download and install BLAST database? (Required for a new install)"; then
