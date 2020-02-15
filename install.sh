@@ -47,15 +47,15 @@ if promptUser "Install system files and update CPAN?"; then
     sudo yum -y install perl-Devel-Peek
 
     
-#    yes | sudo $PERL -MCPAN -e shell <<EOF
-#force install CPAN
-#reload cpan
-#force install YAML
-#force install Test::YAML
-#force install Module::Build
-#o conf prefer_installer MB
-#o conf commit
-#EOF
+    #    yes | sudo $PERL -MCPAN -e shell <<EOF
+    #force install CPAN
+    #reload cpan
+    #force install YAML
+    #force install Test::YAML
+    #force install Module::Build
+    #o conf prefer_installer MB
+    #o conf commit
+    #EOF
 fi
 
 if promptUser "Install Perl dependencies including BioPerl (for the Perl you are using)?"; then
@@ -88,15 +88,17 @@ force install version
 force install List::Util
 force install List::MoreUtils
 force install HTML::Entities 
-force install Bio::Cluster::SequenceFamily
-force install Bio::FeatureIO
 force install File::Sort
-force install Bio::Tools::Run::StandAloneBlast
 EOF
+
+    #force install Bio::Cluster::SequenceFamily
+    #force install Bio::FeatureIO
+    #force install Bio::Tools::Run::StandAloneBlast
+
     # Install other dependencies
-    yes | sudo $PERL ./installScripts/getperldeps.pl
+    sudo $PERL ./installScripts/getperldeps.pl
     # Install BioPerl
-    yes | sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
+    sudo $PERL ./installScripts/installBioperl.pl -perl=$PERL
 fi
 
 if promptUser "Download and install the IntPred model file? (Required for a new install)"; then
@@ -143,3 +145,25 @@ if promptUser "Install TCNlib and dependencies? (Required for a new install)"; t
 fi
 
 
+## t/MSA.t .......................... 5/? align unsuccessful - remote run returned error cdoe 1 at t/MSA.t line 68.
+## # Looks like your test exited with 2 just after 5.
+## t/MSA.t .......................... Dubious, test returned 2 (wstat 512, 0x200)
+## All 5 subtests passed 
+## 
+## 
+## 
+## t/pdb/BLAST.t .................... 1/? 
+## #   Failed test 'use pdb::BLAST;'
+## #   at t/pdb/BLAST.t line 27.
+## #     Tried to use 'pdb::BLAST'.
+## #     Error:  Can't locate Bio/Tools/Run/RemoteBlast.pm in @INC (you may need to install the Bio::Tools::Run::RemoteBlast module) (@INC contains: /disk1/home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/lib /home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/lib /home/amartin/scripts/lib /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5) at /disk1/home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/lib/pdb/BLAST.pm line 170.
+## # BEGIN failed--compilation aborted at /disk1/home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/lib/pdb/BLAST.pm line 170.
+## # Compilation failed in require at t/pdb/BLAST.t line 27.
+## # BEGIN failed--compilation aborted at t/pdb/BLAST.t line 27.
+## Can't locate object method "blastallExec" via package "pdb::BLAST::Local" at /disk1/home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/lib/pdb/BLAST.pm line 147.
+## # Looks like your test exited with 255 just after 2.
+## t/pdb/BLAST.t .................... Dubious, test returned 255 (wstat 65280, 0xff00)
+## Failed 1/2 subtests 
+
+## cd /home/amartin/git/www.bioinf.org.uk/intpred/packages/TCNlib-0.1.2/t/pdb
+## perl BLAST.t 
